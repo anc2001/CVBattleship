@@ -26,7 +26,7 @@ def ramer_douglas_peucker(img, img_gray, visualize=False):
     thresh = cv2.bitwise_not(thresh)
 
     # Find contours - https://docs.opencv.org/master/d4/d73/tutorial_py_contours_begin.html
-    _, contours, _ = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
     # Visualize contours
     if visualize:
