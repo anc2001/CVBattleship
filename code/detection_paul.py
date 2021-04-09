@@ -10,10 +10,10 @@ min_distance = 80
 min_radius = 10
 max_radius = 40
 min_offset = 5
-max_offset = 10
+max_offset = 15
 
 # pre process image
-img = cv2.imread('../data/top/no_background/001/front.png')
+img = cv2.imread('../data/top/no_background/004/front.png')
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 blur = cv2.blur(gray, (3, 3))
 
