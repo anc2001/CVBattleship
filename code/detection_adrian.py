@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # pre process image
-img = cv2.imread('../data/top/background/003/front.png')
+img = cv2.imread('../data/top/background/000/front.png')
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 blur = cv2.blur(gray, (3, 3))
 
@@ -22,10 +22,10 @@ for pt in detected_circles[0,:]:
 sample_size = 10
 xs = np.sort(xs)
 ys = np.sort(ys)
-x_min = int(np.average(xs[0:sample_size]))
-x_max = int(np.average(xs[-sample_size:]))
-y_min = int(np.average(ys[0:sample_size]))
-y_max = int(np.average(ys[-sample_size:]))
+x_min = int(np.average(xs[0:sample_size]) + 20)
+x_max = int(np.average(xs[-sample_size:]) + 20)
+y_min = int(np.average(ys[0:sample_size]) + 40)
+y_max = int(np.average(ys[-sample_size:]) + 40)
 
 cv2.line(img, (x_min, y_max), (x_min, y_min), (255, 255, 255), 2)
 cv2.line(img, (x_min, y_max), (x_max, y_max), (255, 255, 255), 2)
