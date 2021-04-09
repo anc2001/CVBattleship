@@ -6,7 +6,8 @@ from skimage import io, img_as_float32, img_as_ubyte
 from skimage.color import rgb2gray
 import matplotlib.pyplot as plt
 
-image = cv2.imread('../data/bottom/first_setup/004/bottom_sparse.png')
+image = cv2.imread('../data/bottom/no_boat_full.png')
+# image = cv2.imread('thing.png')
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 blur = cv2.GaussianBlur(gray,(15,15),0)
