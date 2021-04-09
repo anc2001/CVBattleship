@@ -16,8 +16,7 @@ def feature_detection(img, img_gray):
     plt.imshow(img)
     plt.show()
 
-# Option 2: Use Ramer-Douglas_Peucker Algorithm to find contours and extract rectangular boxes from contours
-def ramer_douglas_peucker(img, img_gray, visualize=False):
+def find_contours(img, img_gray, visualize=False):
     # Blur image using Gaussian
     blur = cv2.GaussianBlur(img_gray, (15,15), 0)
 
@@ -28,33 +27,56 @@ def ramer_douglas_peucker(img, img_gray, visualize=False):
     # Find contours - https://docs.opencv.org/master/d4/d73/tutorial_py_contours_begin.html
     contours, _ = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
+    # Create contoured_image
+    copied_img = img.copy()
+    copied_img.fill(255)
+    cv2.drawContours(copied_img, contours, -1, (0, 0, 0), 5)
+
     # Visualize contours
     if visualize:
-        copied_img = img.copy()
-        cv2.drawContours(copied_img, contours, -1, (255, 0, 0), 3)
-
         plt.imshow(copied_img)
         plt.show()
+    
+    return copied_img, contours
 
-    # Get rectangles
+def find_rectangles(img, contours, detect, visualize=False):
     rectangles = []
     img_area = np.product(img.shape)
     for cnt in contours:
-        epsilon = 0.01 * cv2.arcLength(cnt, True)
-        approx = cv2.approxPolyDP(cnt, epsilon, False)
-        area = cv2.contourArea(approx)
-        rect = cv2.minAreaRect(approx)
-        box = cv2.boxPoints(rect)
-        box = np.int0(box)
-        percentage = (area * 100) / img_area
-        if percentage < 0.08 and percentage > 0.02:
-            rectangles.append(box)
+        A = cv2.contourArea(cnt, False)
+        p = cv2.arcLength(cnt, True)
+        if p == 0:
+            continue
+        f_circ = (4 * np.pi * A) / (p ** 2)
+
+        if f_circ > 0.5:
+            epsilon = 0.04 * cv2.arcLength(cnt, True)
+            approx = cv2.approxPolyDP(cnt, epsilon, False)
+            area = cv2.contourArea(approx)
+            rect = cv2.minAreaRect(approx)
+            box = cv2.boxPoints(rect)
+            box = np.int0(box)
+            percentage = (area * 100) / img_area
+
+            if detect == 'tile centers':
+                if percentage > 0.001 and percentage < 0.005:
+                    rectangles.append(box)
+            elif detect == 'pins':
+                if percentage > 0.02 and percentage < 0.08:
+                    rectangles.append(box)
+            elif detect == 'tile squares':
+                if percentage > 0.8:
+                    rectangles.append(box)
     
     # Visualize end result
-    cv2.drawContours(img, rectangles, -1, (255, 0, 0), 3)
+    copied_img = img.copy()
+    cv2.drawContours(copied_img, rectangles, -1, (255, 0, 0), 3)
     
-    plt.imshow(img)
-    plt.show()
+    if visualize:
+        plt.imshow(copied_img)
+        plt.show()
+
+    return copied_img
 
 # Get directory of image
 img_dir = Path('../data/bottom/first_setup/004')
@@ -70,4 +92,11 @@ for img_path in img_dir.glob('*.png'):
     # Different options
 
     # feature_detection(img, img_gray, True)
-    ramer_douglas_peucker(img, img_gray, True)
+
+    copied_img, contours = find_contours(img, img_gray, True)
+    copied_gray = cv2.cvtColor(copied_img, cv2.COLOR_BGR2GRAY)
+
+    find_rectangles(copied_img, contours, 'pins', True)
+
+# mng = plt.get_current_fig_manager()
+# mng.full_screen_toggle()
