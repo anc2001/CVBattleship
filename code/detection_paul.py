@@ -9,7 +9,7 @@ blur = cv2.blur(gray, (3, 3))
 
 # detect circles (parameters tuned by me, not sure how we could come up with them using code)
 detected_circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, 
-    1, 85, param1 = 50, param2 = 40, minRadius = 10, maxRadius = 40)
+    1, 85, param1 = 50, param2 = 40, minRadius = 20, maxRadius = 40)
 
 # here I plan on getting rid of the outliers (just calculates centroid rn)
 num_pts = detected_circles.shape[1]
