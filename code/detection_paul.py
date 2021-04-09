@@ -5,22 +5,22 @@ import matplotlib.pyplot as plt
 # pre process image
 img = cv2.imread('../data/top/no_background/004/front.png')
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-blur = cv2.blur(gray, (3, 3))
+blur = cv2.blur(gray, (10, 10))
 
 # detect circles (parameters tuned by me, not sure how we could come up with them using code)
 detected_circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, 
     1, 85, param1 = 50, param2 = 40, minRadius = 10, maxRadius = 40)
 
-# here I plan on getting rid of the outliers (just calculates centroid rn)
-num_pts = detected_circles.shape[1]
-a_av = 0
-b_av = 0
-for pt in detected_circles[0,:]:
-    a_av += int(pt[0])
-    b_av += int(pt[1])
-a_av = a_av/num_pts
-a_av = a_av/num_pts
-centroid = (a_av,b_av)
+# find median radius
+num_circles = detected_circles.shape[1]
+sorted_circles = np.sort(detected_circles[0,:,2])
+med_rad = int(sorted_circles[int(num_circles/2)])
+
+# detect circles with new radius range to get rid of outliers
+min_rad = med_rad - 5
+max_rad = med_rad + 20
+detected_circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, 
+    1, 85, param1 = 50, param2 = 40, minRadius = min_rad, maxRadius = max_rad)
 
 # show circles on image
 for pt in detected_circles[0,:]:
