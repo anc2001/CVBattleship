@@ -7,6 +7,9 @@ img = cv2.imread('../data/top/background/000/front.png')
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 blur = cv2.blur(gray, (3, 3))
 
+x,y,w,h = cv2.boundingRect(blur)
+cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)
+
 # detect circles (parameters tuned by me, not sure how we could come up with them using code)
 detected_circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, 
     1, 85, param1 = 50, param2 = 40, minRadius = 10, maxRadius = 40)
@@ -44,7 +47,9 @@ for pt in detected_circles[0,:]:
     cv2.circle(img, (a,b), r, (0, 255, 0), 2)
     cv2.circle(img, (a,b), 1, (0, 0, 255), 3)
 # press escape to get out of image window or your terminal might bug out
-cv2.imshow("Detected Circles", img)
-key = cv2.waitKey(0)
-if key == 27:
-    cv2.destroyAllWindows()
+plt.imshow(img)
+plt.show()
+# cv2.imshow("Detected Circles", img)
+# key = cv2.waitKey(0)
+# if key == 27:
+#     cv2.destroyAllWindows()
