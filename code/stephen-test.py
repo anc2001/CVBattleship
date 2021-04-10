@@ -78,8 +78,25 @@ def find_rectangles(img, contours, detect, visualize=False):
 
     return copied_img
 
+def perspective_transform(img):
+    top_left, top_right, bottom_left, bottom_right = [490, 257], [1533, 260], [475, 1351], [1576, 1325]
+    x_size, y_size = img.shape[1], img.shape[0]
+
+    inner_crop = np.float32([top_left, top_right, bottom_left, bottom_right])
+    outer_crop = np.float32([[0, 0], [x_size, 0], [0, y_size], [x_size, y_size]])
+
+    M = cv2.getPerspectiveTransform(inner_crop, outer_crop)
+
+    dst = cv2.warpPerspective(img, M, (x_size, y_size))
+
+    plt.subplot(121),plt.imshow(img),plt.title('Input')
+    plt.subplot(122),plt.imshow(dst),plt.title('Output')
+    mng = plt.get_current_fig_manager()
+    mng.full_screen_toggle()
+    plt.show()
+
 # Get directory of image
-img_dir = Path('../data/bottom/first_setup/004')
+img_dir = Path('../data/top/no_background/000')
 
 # For each image in the directory of type PNG
 for img_path in img_dir.glob('*.png'):
@@ -93,10 +110,13 @@ for img_path in img_dir.glob('*.png'):
 
     # feature_detection(img, img_gray, True)
 
-    copied_img, contours = find_contours(img, img_gray, True)
-    copied_gray = cv2.cvtColor(copied_img, cv2.COLOR_BGR2GRAY)
+    # copied_img, contours = find_contours(img, img_gray, True)
+    # copied_gray = cv2.cvtColor(copied_img, cv2.COLOR_BGR2GRAY)
 
-    find_rectangles(copied_img, contours, 'pins', True)
+    # find_rectangles(copied_img, contours, 'pins', True)
+
+    perspective_transform(img)
+    exit()
 
 # mng = plt.get_current_fig_manager()
 # mng.full_screen_toggle()
