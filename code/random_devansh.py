@@ -1,22 +1,17 @@
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
 
-image  = cv2.imread("../data/bottom/first_setup/000/bottom_sparse.png")
+image  = cv2.imread("../data/10x10grid.png")
 cv2.imshow("Image", image)
-cv2.waitKey(0)
 
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 cv2.imshow("gray", gray)
-cv2.waitKey(0)
 
 blur = cv2.GaussianBlur(gray, (5,5), 0)
 cv2.imshow("blur", blur)
-cv2.waitKey(0)
 
 thresh = cv2.adaptiveThreshold(blur, 255, 1, 1, 11, 2)
 cv2.imshow("thresh", thresh)
-cv2.waitKey(0)
 
 contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -35,20 +30,16 @@ mask = np.zeros((gray.shape),np.uint8)
 cv2.drawContours(mask,[best_cnt],0,255,-1)
 cv2.drawContours(mask,[best_cnt],0,0,2)
 cv2.imshow("mask", mask)
-cv2.waitKey(0)
 
 out = np.zeros_like(gray)
 out[mask == 255] = gray[mask == 255]
 cv2.imshow("New image", out)
-cv2.waitKey(0)
 
 blur = cv2.GaussianBlur(out, (5,5), 0)
 cv2.imshow("blur1", blur)
-cv2.waitKey(0)
 
 thresh = cv2.adaptiveThreshold(blur, 255, 1, 1, 11, 2)
 cv2.imshow("thresh1", thresh)
-cv2.waitKey(0)
 
 contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
