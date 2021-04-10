@@ -7,13 +7,20 @@ parameter1 = 50
 parameter21 = 30
 parameter22 = 40
 min_distance = 80
-min_radius = 10
+min_radius = 20
 max_radius = 40
-min_offset = 5
-max_offset = 15
+min_offset = 10
+max_offset = 20
+target_image_size = 1000.0
 
 # pre process image
 img = cv2.imread('../data/top/no_background/004/front.png')
+
+# scale_percent = target_image_size/img.shape[1]
+# width = int(img.shape[1] * scale_percent)
+# height = int(img.shape[0] * scale_percent)
+# img = cv2.resize(img,(width, height))
+
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 blur = cv2.blur(gray, (3, 3))
 

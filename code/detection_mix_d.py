@@ -9,8 +9,8 @@ parameter22 = 40
 min_distance = 80
 min_radius = 20
 max_radius = 40
-min_offset = 5
-max_offset = 22
+min_offset = 10
+max_offset = 20
 
 # pre process image
 img = cv2.imread('../data/top/no_background/004/front.png')
@@ -58,6 +58,57 @@ y_step = (y_max - y_min) / 10
 for i in range(11):
     cv2.line(img, (int(x_min + x_step*i), y_max), (int(x_min + x_step*i), y_min), (255, 255, 255), 2)
     cv2.line(img, (x_min, int(y_min + y_step*i)), (x_max, int(y_min + y_step*i)), (255, 255, 255), 2)
+
+# calculate board representation from current grid
+board = np.zeros((10,10))
+for i in range(10):
+    for j in range(10):
+        
+        x_left = int(x_min + x_step*j)
+        x_right = int(x_left + x_step)
+        y_up = int(y_min + y_step*i)
+        y_down = int(y_up + y_step)
+
+        circle = False
+        ba = 0
+        bb = 0
+        br = 0
+        for pt in detected_circles[0,:]:
+            a, b, r = int(pt[0]), int(pt[1]), int(pt[2])
+            if x_left <= a <= x_right and y_up <= b <= y_down:
+                circle = True
+                ba = a
+                bb = b
+                br = r
+
+        if circle == True:
+            red_window = img[bb-br:bb+br,ba-br:ba+br,2]
+            window = img[bb-br:bb+br,ba-br:ba+br,:]
+        else:
+            red_window = img[y_up:y_down,x_left:x_right,2]
+            window = img[y_up:y_down,x_left:x_right,:]
+        value = int(np.mean(window))
+        red_value = int(np.mean(red_window))
+        if value > 200:
+            board[i,j] = 1
+        elif red_value > 200:
+            board[i,j] = 2
+        else:
+            board[i,j] = 0
+
+# visualize the board
+canvas = np.zeros((1000,1000,3))
+for i in range(10):
+    for j in range(10):
+        start = (50 + 100*j,50+ 100*i)
+        if board[i,j] == 1:
+            cv2.circle(canvas, start, 50, (255, 255, 255), -1)
+        elif board[i,j] == 2:
+            cv2.circle(canvas, start, 50, (0, 0, 255), -1)
+        else:
+            cv2.circle(canvas, start, 50, (255, 0, 0), -1)
+cv2.imshow("Board", canvas)
+cv2.waitKey(0)
 
 # show circles on image
 for pt in detected_circles[0,:]:
