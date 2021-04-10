@@ -55,7 +55,7 @@ cv2.line(img, (x_max, y_min), (x_max, y_max), (255, 255, 255), 2)
 
 x_step = (x_max - x_min) / 10
 y_step = (y_max - y_min) / 10
-for i in range(11):
+for i in range(1):
     cv2.line(img, (int(x_min + x_step*i), y_max), (int(x_min + x_step*i), y_min), (255, 255, 255), 2)
     cv2.line(img, (x_min, int(y_min + y_step*i)), (x_max, int(y_min + y_step*i)), (255, 255, 255), 2)
 
