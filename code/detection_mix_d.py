@@ -9,8 +9,8 @@ parameter22 = 40
 min_distance = 80
 min_radius = 20
 max_radius = 40
-min_offset = 5
-max_offset = 22
+min_offset = 10
+max_offset = 20
 
 # pre process image
 img = cv2.imread('../data/top/no_background/004/front.png')
