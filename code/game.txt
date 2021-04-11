@@ -1,0 +1,90 @@
+Battleship game program structure (loosely based off of CS17 connect4)
+Done generally in OO style programming (Or I'd like to believe so)
+
+Note* there aren't actually interfaces in python, so this class is only in spirit. 
+The only classes with code are Human and AI. I'd love to create an abstract class with the shared code, but 
+I have no idea how to in python. The methods that should have identical implementations are 
+has_not_lost(), show_top_board(), and show_bottom_board() 
+
+Class PlayerInterface
+    Methods
+        receive_turn(String move)
+            receives move from opposing player and alters board accordingly
+            returns 0 if successful, 1 if it was an valid move
+        suggest_turn(Numpy array of shape (10,10))
+            returns the next move as a string of specificed format
+        make_turn(String move)
+            Makes turn, it is ensured that the input string is valid
+        has_not_lost()
+            returns boolean, True if player has not lost, False if they have
+        show_top_board()
+	    Prints the internal top (opposing) board for that player
+	show_bottom_board()
+	    Prints the internal bottom (own) board for that player
+
+Class Human(PlayerInterface)
+    Constructor 
+        Polls in terminal where player wants to place ships
+    Fields
+        (10,10) numpy array that is the opposing board
+        (10,10) numpy array that is their own board
+        (5,) numpy array of tuples of form (array_or_column, shared, start, end)
+	(5,) numpy array of booleans that are true if the corresponding ship has been sunk
+    Methods (implemented)
+        receive_turn(String move)
+            receives move from opposing player and alters own board accordingly
+            returns 0 if successful, 1 if it was an valid move
+        suggest_turn(Numpy array of shape (10,10))
+            Poll in terminal from player 
+            returns the next move as a string of specificed format
+        make_turn(String move)
+            Makes turn by altering opposing board, it is ensured that the input string is valid
+	    returns nothing
+        has_not_lost()
+            returns boolean, True if player has not lost, False if they have
+        show_top_board()
+	    Prints the internal top (opposing) board for that player
+	show_bottom_board()
+	    Prints the internal bottom (own) board for that player
+
+Class AI(PlayerInterface)
+    Constructor 
+        Randomly places ships (for now) 
+    Fields
+        (10,10) numpy array that is the opposing board
+        (10,10) numpy array that is their own board
+        (5,) numpy array of tuples of form (array_or_column, shared, start, end)
+	(5,)  numpy array of booleans that are true if the corresponding ship has been sunk
+        Boolean value that states whether they have lost or are still active
+    Methods (implemented)
+        receive_turn(String move)
+            receives move from opposing player and alters own board accordingly
+            returns 0 if successful, 1 if it was an valid move
+        suggest_turn(Numpy array of shape (10,10))
+            Input array will come from image 
+            If the array is different than what is currently saved, raise exception 
+            returns the next move as a string of specificed format
+        make_turn(String move)
+            Makes turn by altering opposing board, poll until that confirmational change 
+            is shown on input image
+        has_not_lost()
+            returns boolean, True if player has not lost, False if they have
+        show_top_board()
+	    Prints the internal top (opposing) board for that player
+	show_bottom_board()
+	    Prints the internal bottom (own) board for that player
+
+CLass Referee
+    Constructor 
+        Two objects of type PlayerInterface
+    Methods
+        play_game
+            Use a while loop over has_not_lost of the opposing player, ask current player to suggest_turn, 
+            loop until the opposing player returns 0 with receive_turn, call make_turn on
+            current player and then switch players
+        other_player()
+            Returns the other player that is not the current player
+
+Class Game
+    Constructs the two players according the program arguments, passes them into 
+    a newly created Referee and calls play_game
