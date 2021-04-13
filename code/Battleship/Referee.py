@@ -8,6 +8,12 @@ class Referee:
         self.player2 = Player2
         self.isplayer1 = 1
     
+    def other_player(self, Player):
+        if(Player == self.player1):
+            return self.player2
+        else :
+            return self.player1
+    
     def play_game(self):
         pass
 
