@@ -1,0 +1,44 @@
+Game TODOs
+
+Hopefully we can finish these and actually do the fun part which is CV and neural nets
+
+Overall, integrate cameras and make it such that you can run any player with a
+camera on or not and still have a functioning game
+
+Game.py 
+Update program arguments to take in whether or not each of the players will use 
+a camera or not. The players will have a use_camera field which is either 1 or 0, 
+update accordingly. Throw errors and print messages accordingly for cameras not opening
+or not enough cameras. 
+
+UI
+update or change the show_opp_board and show_own_board in methods
+so that they are more visually appealing than just printing on 
+the terminal. Just a reminder for whoever does this
+
+Top board 
+0 -> nothing
+1 -> miss
+2 -> hit
+
+Bottom board 
+(first digit in binary is whether or not its been hit or not, second is whether a boat is there or not)
+0 -> No boat, nothing 
+1 -> No boat, miss
+2 -> Boat, nothing
+3 -> Boat, hit
+
+Update Referee.py with whatever the plan is for the UI
+
+Players
+add a use_camera field and update all the methods to check the use_camera field before
+doing the work. Move make_move and detect_board to PlayerInterface. Only suggest_turn should be 
+different for Human and AI. If use_camera is 0, the game should function identically. If use_camera 
+is 1 then the program should poll to see confirmational change in the camera before continuing and 
+print informative messages as necessary. 
+
+In the future Adjust Human and AI constructor to be able to take in the board and automatically 
+fill it internally with detection. 
+
+Right now the camera should just see and detect the top board, unkown functionality otherwise. 
+
