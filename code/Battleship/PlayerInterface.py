@@ -17,11 +17,12 @@ class PlayerInterface:
     def __init__(self):
         self.opp_board = np.zeros((10,10))
         self.own_board = np.zeros((10,10))
-        self.battleships = np.zeros((5,4))
+        self.battleships = []
+        self.battleship_coords = []
         self.battleship_sunk = np.zeros((5,))
     
     # Returns true if this player has lost, false otherwise
-    def has_not_lost(self):
+    def has_lost(self):
         return_val = 1
         for i in self.battleship_sunk:
             return_val = return_val and i
@@ -35,41 +36,78 @@ class PlayerInterface:
     def show_own_board(self):
         print(self.own_board)
 
-    # Receives move of specified format letter followed by integer, changes
-    # board and returns 1 if the move is valid and makes change, returns 0
-    # if the move is invalid
-    def receive_turn(self, move):
-        def convert_command(move):
-            row = 0
-            column = 0
-            if len(move) == 2:
-                row = ord(move[0])-65
-                if not (row >= 0 and row <= 9):
-                    return 0
-                column = int(move[1]) - 1
-                if not (column >= 0 and column <= 9):
-                    return 0
+    def set_own_board(self):
+        def info_to_coordinates(row, col, orientation, size):
+            coordinates = []
+            if orientation == 'up':
+                for i in range(size):
+                    coordinates.append(chr(ord(row) - i) + col)
+            elif orientation == 'down':
+                for i in range(size):
+                    coordinates.append(chr(ord(row) + i) + col)
+            elif orientation == 'left':
+                for i in range(size):
+                    coordinates.append(row + str((int(col) - i)))
+            elif orientation == 'right':
+                for i in range(size):
+                    coordinates.append(row + str((int(col) + i)))
+            return coordinates
+
+        def converter(moves):
+            coordinates = []
+            for move in moves:
+                if len(move == 3):
+                    row = ord(move[0])-65
+                    column = int(move[1]) - 1
                 else:
-                    return 0
-            elif len(move) == 3:
-                row = ord(move[0])-65
-                if not (row >= 0 and row <= 9):
-                    return 0
-                column = int(move[1:3]) - 1
-                if not column == 9:
-                    return 0
+                    row = ord(move[0])-65
+                    column = int(move[1:3]) - 1
+                self.own_board[row][column] = 2
+                coordinates.append((row, column))
+            return coordinates  
+
+        for i in range(5):
+            ship = self.battleships[i]
+            coords = info_to_coordinates(ship[0], ship[0], ship[0], ship[0])
+            self.battleship_coords[i] = converter(coords)
+
+    # Receives move of specified format letter followed by integer, changes
+    # board and returns 1 if the move is valid and misses, returns 2 if the 
+    # move is valid and hits, returns 0 if the move is invalid
+    def receive_turn(self, move):
+
+        def check_if_sunk(row, col):
+            for i in range(5):
+                ship_coordinates = self.battleship_coords[i]
+                for coord in ship_coordinates:
+                    if coord == (row, col):
+                        flag = 4
+                        for (x,y) in ship_coordinates:
+                            flag = flag & self.own_board[x][y]
+                        if flag == 4:
+                            self.battleship_sunk[i] = 1
+        
+        row = 0
+        column = 0
+        if len(move) == 2:
+            row = ord(move[0])-65
+            if not (row >= 0 and row <= 9):
+                return 0
+            column = int(move[1]) - 1
+            if not (column >= 0 and column <= 9):
+                return 0
             else:
                 return 0
-        return (row, column)
-
-
-
-        coord = self.convert_command(move)
-        if not coord:
+        elif len(move) == 3:
+            row = ord(move[0])-65
+            if not (row >= 0 and row <= 9):
+                return 0
+            column = int(move[1:3]) - 1
+            if not column == 9:
+                return 0
+        else:
             return 0
         
-        row = coord[0]
-        column = coord[1]
         if 1 and self.own_board[row][column]:
             print("Already tried to move there!")
             return 0
@@ -77,19 +115,9 @@ class PlayerInterface:
         if 2 and self.own_board[row][column]:
             self.own_board[row][column] = 3
             print("Hit!")
-            self.check_if_sunk(coord)
+            check_if_sunk(row, column)
+            return 2
         else:
             self.own_board[row][column] = 1
             print("Miss!")
-        return 1
-
-    #Called when coordinate value has hit a ship, checks if the associated ship
-    #has been sunk, and sets value accordingly 
-    def check_if_sunk(self, coord):
-        for i in range(5):
-            battleship = self.battleships[i]
-            if int(battleship[0]) == coord[0] or int(battleship[1]) == coord[1]:
-                for j in range()
-
-        return
-
+            return 1

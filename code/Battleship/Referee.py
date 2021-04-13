@@ -8,24 +8,33 @@ class Referee:
         self.player2 = Player2
         self.isplayer1 = 1
     
-    def other_player(self, Player):
-        if(Player == self.player1):
+    def other_player(self):
+        if(self.isplayer1):
             return self.player2
         else :
             return self.player1
     
     def play_game(self):
-        Player = self.player1
-        while(Player.has_not_lost):
-            Player.show_opp_board()
-            move = Player.suggest_turn(np.zeros((10,10)))           
-            if(Player.receive_turn(move)) :
-                Player.make_turn(move)
-                Player = self.other_player(Player)
-            else :
-                print("\nInvalid move, try again\n")
-                continue
-
+        current_player = self.player1
+        names = ["Player 1", "Player 2"]
+        while(not current_player.has_lost()):
+            print("It's {}'s turn".format(names[not self.isplayer1]))
+            current_player.show_opp_board()
+            current_player.show_own_board()
+            move = current_player.suggest_turn(current_player.opp_board)
+            hit_or_miss = self.other_player().receive_turn(move)
+            while(not hit_or_miss): 
+                print("Invalid Move! Try again!")
+                move = current_player.suggest_turn(current_player.opp_board)
+                hit_or_miss = self.other_player().receive_turn(move)
+            if hit_or_miss == 1:
+                current_player.make_turn(move + "M")
+            else:
+                current_player.make_turn(move + "H")
+            current_player = self.other_player()
+            self.isplayer1 = not self.isplayer1
+         print("{} has lost".format(names[not self.isplayer1]))
+        
 
     """
     Returns a board state corresponding to the input image.

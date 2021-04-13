@@ -6,7 +6,8 @@ class Human(PlayerInterface):
     def __init__(self):
         super(Human, self).__init__()
         # Battleship terminal stuff
-        self.place_battleships()
+        self.battleships = self.place_battleships()
+        self.set_own_board()
 
     # Takes in move of specificed format, this is guaranteed to be a valid move, 
     # so just edit the opposing board
@@ -128,4 +129,4 @@ class Human(PlayerInterface):
         while player_col != '10' and (len(player_col) != 1 or not player_col.isnumeric()):
             player_col = input("Please enter a number (1-10) indicating the column of your move (1-10): ")
         
-        return player_row, player_col
+        return player_row + player_col
