@@ -66,12 +66,11 @@ class Referee:
             distances[i] = math.sqrt(((av_x - pt[0]) ** 2) + ((av_y - pt[1]) ** 2))
         distances_indices = np.argsort(distances)
         closest_pts = np.zeros((4,2))
-        for i in range(4):
-            closest_pts[i,0] = detected_circles[0,distances_indices[i]][0]
-            closest_pts[i,1] = detected_circles[0,distances_indices[i]][1]
         center_x = 0
         center_y = 0
         for i in range(4):
+            closest_pts[i,0] = detected_circles[0,distances_indices[i]][0]
+            closest_pts[i,1] = detected_circles[0,distances_indices[i]][1]
             center_x += closest_pts[i,0]
             center_y += closest_pts[i,1]
         center_x = center_x / 4
