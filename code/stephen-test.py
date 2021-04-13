@@ -3,7 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-# Option 1: Detect features
 def feature_detection(img, img_gray):
     # Grab features - https://docs.opencv.org/3.4/dd/d1a/group__imgproc__feature.html#ga1d6bb77486c8f92d79c8793ad995d541
     features = cv2.goodFeaturesToTrack(img_gray, maxCorners=1000, qualityLevel=0.05, minDistance=5)
@@ -124,10 +123,10 @@ def get_corners(img):
     y_min = int(np.average(ys[0:sample_size]) + 40)
     y_max = int(np.average(ys[-sample_size:]) + 40)
 
-    cv2.line(img, (x_min, y_max), (x_min, y_min), (255, 0, 0), 2)
-    cv2.line(img, (x_min, y_max), (x_max, y_max), (255, 0, 0), 2)
-    cv2.line(img, (x_min, y_min), (x_max, y_min), (255, 0, 0), 2)
-    cv2.line(img, (x_max, y_min), (x_max, y_max), (255, 0, 0), 2)
+    # cv2.line(img, (x_min, y_max), (x_min, y_min), (255, 0, 0), 2)
+    # cv2.line(img, (x_min, y_max), (x_max, y_max), (255, 0, 0), 2)
+    # cv2.line(img, (x_min, y_min), (x_max, y_min), (255, 0, 0), 2)
+    # cv2.line(img, (x_max, y_min), (x_max, y_max), (255, 0, 0), 2)
 
     # Add error margin
     # x_min -= 50
@@ -139,12 +138,43 @@ def get_corners(img):
     corners = np.float32([[x_min, y_min], [x_max, y_min], [x_min, y_max], [x_max, y_max]])
     return corners
 
+def detect_biggest_rect(img):
+    # Convert to grayscale
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Blur image using Gaussian
+    blur = cv2.GaussianBlur(img_gray, (15,15), 0)
+
+    # Find threshold of blur
+    thresh = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+    thresh = cv2.bitwise_not(thresh)
+
+    # Find contours
+    contours, _ = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Find top n largest area contours
+    top_32 = np.zeros((32, 2))
+    for idx in range(len(contours)):
+        approx = cv2.approxPolyDP(contours[idx], 0.01 * cv2.arcLength(contours[idx], True), False)
+        area = cv2.contourArea(approx, False)
+        if np.min(top_32[:,0]) < area:
+            index_to_replace = np.argmin(top_32[:, 0])
+            top_32[index_to_replace] = [area, idx]
+    
+    results = np.array(contours)[np.uint8(top_32[:, 1])]
+
+    # Create contoured_image
+    cv2.drawContours(img, results, -1, (255, 0, 0), 5)
+    plt.imshow(img)
+    plt.show()
+
 def perspective_transform(img, corners):
-    # top_left, top_right, bottom_left, bottom_right = [490, 257], [1533, 260], [475, 1351], [1576, 1325]
+    # top_left, top_right, bottom_left, bottom_right = [495, 179], [1693, 162], [552, 1319], [1664, 1300] # top/no_background/004/front
+    top_left, top_right, bottom_left, bottom_right = [757, 197], [1855, 246], [780, 1550], [1766, 1284] # top/no_background/004/left
     x_size, y_size = img.shape[1], img.shape[0]
 
-    # inner_crop = np.float32([top_left, top_right, bottom_left, bottom_right])
-    inner_crop = corners
+    inner_crop = np.float32([top_left, top_right, bottom_left, bottom_right])
+    # inner_crop = corners
     outer_crop = np.float32([[0, 0], [x_size, 0], [0, y_size], [x_size, y_size]])
 
     M = cv2.getPerspectiveTransform(inner_crop, outer_crop)
@@ -163,7 +193,8 @@ img_dir = Path('../data/top/no_background/004')
 # For each image in the directory of type PNG
 for img_path in img_dir.glob('*.png'):
     # Grab image
-    img = cv2.imread(str(img_path))
+    # img = cv2.imread(str(img_path))
+    img = cv2.imread('../data/top/no_background/004/left.png')
 
     # Convert to grayscale
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -178,6 +209,8 @@ for img_path in img_dir.glob('*.png'):
     # find_rectangles(copied_img, contours, 'pins', True)
 
     perspective_transform(img, get_corners(img))
+
+    # detect_biggest_rect(img)
     exit()
 
 # mng = plt.get_current_fig_manager()
