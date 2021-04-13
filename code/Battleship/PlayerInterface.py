@@ -80,35 +80,26 @@ class PlayerInterface:
         def check_if_sunk(hit_row, hit_col):
             for i in range(5):
                 ship_coordinates = self.battleship_coords[i]
-                for coord in ship_coordinates:
-                    if coord[0] == hit_row and coord[1] == hit_col: 
-                        flag = 3
-                        for (x,y) in ship_coordinates:
-                            flag = flag & int(self.own_board[x][y])
-                        if flag == 3:
-                            self.battleship_sunk[i] = 1
-                            return 1
-                        return 0
+                if not self.battleship_sunk[i]:
+                    for coord in ship_coordinates:
+                        if coord[0] == hit_row and coord[1] == hit_col: 
+                            flag = 3
+                            for (x,y) in ship_coordinates:
+                                flag = flag & int(self.own_board[x][y])
+                            if flag == 3:
+                                self.battleship_sunk[i] = 1
+                                return 1
+                            return 0
             return 0
         
         row = 0
         column = 0
         if len(move) == 2:
             row = ord(move[0])-65
-            if not (row >= 0 and row <= 9):
-                return 0
             column = int(move[1]) - 1
-            if not (column >= 0 and column <= 9):
-                return 0
         elif len(move) == 3:
             row = ord(move[0])-65
-            if not (row >= 0 and row <= 9):
-                return 0
             column = int(move[1:3]) - 1
-            if not column == 9:
-                return 0
-        else:
-            return 0
         
         if 1 & int(self.own_board[row][column]):
             print("Already tried to move there!")
