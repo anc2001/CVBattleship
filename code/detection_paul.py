@@ -74,8 +74,8 @@ for i in range(4):
 center_x = center_x / 4
 center_y = center_y / 4
 
-x_step = int(2 * abs(center_x - np.amax(closest_pts[:,0])))
-y_step = int(2 * abs(center_y - np.amax(closest_pts[:,1])))
+x_step = int(2 * np.amin(np.absolute(closest_pts[:,0] - center_x))) + 5
+y_step = int(2 * np.amin(np.absolute(closest_pts[:,1] - center_y))) + 5
 
 x_min = int(center_x - (5 * x_step))
 x_max = int(center_x + (5 * x_step))
