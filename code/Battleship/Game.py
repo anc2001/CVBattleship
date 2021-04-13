@@ -29,11 +29,14 @@ def parse_args():
 def main():
     args = parse_args()
     if(args.playermode == "hvh"):
-        Referee(Human(), Human())
+        referee = Referee(Human(), Human())
+        referee.play_game()
     elif (args.playermode == "hva"):
-        Referee(Human(), AI())
+        referee = Referee(Human(), AI())
+        referee.play_game()
     elif (args.playermode == "ava"):
-        Referee(AI(), AI())
+        referee = Referee(AI(), AI())
+        referee.play_game()
 
 
 

@@ -56,20 +56,21 @@ class PlayerInterface:
         def converter(moves):
             coordinates = []
             for move in moves:
-                if len(move == 3):
+                if len(move) == 2:
                     row = ord(move[0])-65
                     column = int(move[1]) - 1
-                else:
+                    self.own_board[row][column] = 2
+                elif len(move) == 3:
                     row = ord(move[0])-65
                     column = int(move[1:3]) - 1
-                self.own_board[row][column] = 2
+                    self.own_board[row][column] = 2
                 coordinates.append((row, column))
             return coordinates  
 
         for i in range(5):
             ship = self.battleships[i]
-            coords = info_to_coordinates(ship[0], ship[0], ship[0], ship[0])
-            self.battleship_coords[i] = converter(coords)
+            coords = info_to_coordinates(ship[0], ship[1], ship[2], ship[3])
+            self.battleship_coords.append(converter(coords))
 
     # Receives move of specified format letter followed by integer, changes
     # board and returns 1 if the move is valid and misses, returns 2 if the 
@@ -83,9 +84,12 @@ class PlayerInterface:
                     if coord == (row, col):
                         flag = 4
                         for (x,y) in ship_coordinates:
-                            flag = flag & self.own_board[x][y]
+                            flag = flag & int(self.own_board[x][y])
                         if flag == 4:
                             self.battleship_sunk[i] = 1
+                            return 1
+                        return 0
+            return 0
         
         row = 0
         column = 0
@@ -95,8 +99,6 @@ class PlayerInterface:
                 return 0
             column = int(move[1]) - 1
             if not (column >= 0 and column <= 9):
-                return 0
-            else:
                 return 0
         elif len(move) == 3:
             row = ord(move[0])-65
@@ -108,15 +110,19 @@ class PlayerInterface:
         else:
             return 0
         
-        if 1 and self.own_board[row][column]:
+        if 1 & int(self.own_board[row][column]):
             print("Already tried to move there!")
             return 0
 
-        if 2 and self.own_board[row][column]:
+        if 2 & int(self.own_board[row][column]):
             self.own_board[row][column] = 3
             print("Hit!")
-            check_if_sunk(row, column)
-            return 2
+            sunk = check_if_sunk(row, column)
+            if sunk: 
+                print("You sunk one as well!")
+                return 3
+            else:
+                return 2
         else:
             self.own_board[row][column] = 1
             print("Miss!")

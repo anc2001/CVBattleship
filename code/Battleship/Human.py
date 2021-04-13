@@ -12,7 +12,7 @@ class Human(PlayerInterface):
     # Takes in move of specificed format, this is guaranteed to be a valid move, 
     # so just edit the opposing board
     def make_turn(self, move):
-        if len(move == 3):
+        if len(move) == 3:
             row = ord(move[0])-65
             column = int(move[1]) - 1
             if ord(move[2]) == 72:
@@ -120,12 +120,12 @@ class Human(PlayerInterface):
     # Polls in terminal for the human to give their turn. array input is not used.
     def suggest_turn(self, array):
         # Get row for move
-        player_row = input("Enter the column of your move (A-J): ").upper()
+        player_row = input("Enter the row of your move (A-J): ").upper()
         while len(player_row) != 1 or not player_row.isalpha() or not player_row in "ABCDEFGHIJ":
             player_row = input("Please enter a letter (A-J) indicating the row of your move (A-J): ").upper()
         
         # Get column for move
-        player_col = input("Enter the row of your move (1-10): ")
+        player_col = input("Enter the column of your move (1-10): ")
         while player_col != '10' and (len(player_col) != 1 or not player_col.isnumeric()):
             player_col = input("Please enter a number (1-10) indicating the column of your move (1-10): ")
         
