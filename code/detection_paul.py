@@ -127,7 +127,7 @@ for i in range(10):
 
 
 # visualize the board
-scale_percent = 800/img.shape[0]
+scale_percent = 800.0/img.shape[0]
 width = int(img.shape[1] * scale_percent)
 height = int(img.shape[0] * scale_percent)
 shrink = cv2.resize(img,(width, height))
