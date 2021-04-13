@@ -24,7 +24,7 @@ class Referee:
                 Player.make_turn(move)
                 Player = self.other_player(Player)
             else :
-                print("Invalid move, try again")
+                print("\nInvalid move, try again\n")
                 continue
             
 
