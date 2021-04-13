@@ -15,7 +15,20 @@ class Referee:
             return self.player1
     
     def play_game(self):
-        pass
+        Player = self.player1
+        while(self.other_player(Player).has_not_lost):
+            Player.show_opp_board()
+            Player.suggest_turn(np.zeros((10,10)))
+            move = input("Enter a move")
+            if(Player.receive_turn(move)) :
+                Player.make_turn(move)
+                Player = self.other_player(Player)
+            else :
+                print("Invalid move, try again")
+                continue
+            
+
+
 
 
     """
