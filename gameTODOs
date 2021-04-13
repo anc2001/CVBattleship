@@ -42,3 +42,6 @@ fill it internally with detection.
 
 Right now the camera should just see and detect the top board, unkown functionality otherwise. 
 
+At some point we should do something with Arcuro markers so that we can ust have the corners of the
+top and bottom board, use the morph thing, and do that 
+
