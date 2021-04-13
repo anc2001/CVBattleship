@@ -18,17 +18,13 @@ class Referee:
         Player = self.player1
         while(Player.has_not_lost):
             Player.show_opp_board()
-            Player.suggest_turn(np.zeros((10,10)))
-            move = input("Enter a move")
+            move = Player.suggest_turn(np.zeros((10,10)))           
             if(Player.receive_turn(move)) :
                 Player.make_turn(move)
                 Player = self.other_player(Player)
             else :
                 print("\nInvalid move, try again\n")
                 continue
-            
-
-
 
 
     """
