@@ -25,10 +25,6 @@ def parse_args():
 
     return parser.parse_args()
 
-class Player(object):
-    def __init__(self, name):
-        self.name = name
-
 
 def main():
     args = parse_args()
