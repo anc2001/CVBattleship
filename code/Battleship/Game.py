@@ -29,44 +29,15 @@ class Player(object):
     def __init__(self, name):
         self.name = name
 
-class HumanPlayer(Player):
-    def __init__(self, name):
-        super(HumanPlayer, self).__init__(name)
-
-    # possible implementation - not sure
-    # def play(self, state, actions):
-    #     while True:
-    #         move = raw_input(self.name + ", please enter a move: ")
-    #         if move not in actions:
-    #             print("That move is not available. Try again!")
-    #         else:
-    #             return move
-
-class AIPlayer(Player):
-    def __init__(self, name):
-        super(AIPlayer, self).__init__(name)
-        
-    # possible implementation - not sure
-    def play(self, state, actions):
-        return random.choice(actions)
 
 def main():
     args = parse_args()
     if(args.playermode == "hvh"):
-        player1 = args.player1
-        player2 = args.player2
-        if not(args.player1):
-            player1 = "player1"
-        if not(args.player2):
-            player2 = "player2"
-        Referee(HumanPlayer(player1), HumanPlayer(player2))
+        Referee(Human(), Human())
     elif (args.playermode == "hva"):
-        player1 = ""
-        if not(args.player1):
-            player1 = "player1"
-        Referee(HumanPlayer(player1), AIPlayer("ai"))
+        Referee(Human(), AI())
     elif (args.playermode == "ava"):
-        Referee(AIPlayer("ai1"), AIPlayer("ai2"))
+        Referee(AI(), AI())
 
 
 
