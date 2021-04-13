@@ -29,6 +29,51 @@ class Human(PlayerInterface):
                 value = 1
             self.opp_board[row][column] = value  
         return 0
+
+    # Print battleship board
+    def print_board(self, battleship_info):
+        board = np.zeros((10, 10))
+        for (row, col, orientation, size) in battleship_info:
+            coordinates = self.info_to_coordinates(row, col, orientation, size)
+            for coordinate in coordinates:
+                row, col = ord(coordinate[0]) - 65, int(coordinate[1]) - 1
+                board[row][col] = 1
+        print(board)
+        return board
+
+
+    # Given coordinates, orientation, and size, return coordinates that battleship occupies
+    def info_to_coordinates(self, row, col, orientation, size):
+        coordinates = []
+        if orientation == 'up':
+            for i in range(size):
+                coordinates.append(chr(ord(row) - i) + col)
+        elif orientation == 'down':
+            for i in range(size):
+                coordinates.append(chr(ord(row) + i) + col)
+        elif orientation == 'left':
+            for i in range(size):
+                coordinates.append(row + str((int(col) - i)))
+        elif orientation == 'right':
+            for i in range(size):
+                coordinates.append(row + str((int(col) + i)))
+        return coordinates
+
+    # Returns whether or not there is a conflict when adding a battleship to a coordinate
+    def conflict_exists(self, battleship_info, row, col, orientation, size):
+        if ((orientation == 'up' and ord(row) - 64 - size < 0) or 
+            (orientation == 'down' and ord(row) - 64 + size > 11) or 
+            (orientation == 'left' and int(col) + size < 0) or 
+            (orientation == 'right' and int(col) + size > 11)):
+            return True
+
+        for (ship_row, ship_col, ship_orientation, ship_size) in battleship_info:
+            ship_coordinates = self.info_to_coordinates(ship_row, ship_col, ship_orientation, ship_size)
+            curr_coordinates = self.info_to_coordinates(row, col, orientation, size)
+
+            if not set(ship_coordinates).isdisjoint(curr_coordinates):
+                return True
+        return False
     
     # Prompts user to place 5 battleships on a 10x10 grid. 
     # Returns an array of battleship info that is 5 x 4 with each inner array being in format: [row, column, ship orientation, ship size]
@@ -41,39 +86,6 @@ class Human(PlayerInterface):
             ['Carrier', 5]
         ]
         battleship_info = []
-
-        # Given coordinates, orientation, and size, return coordinates that battleship occupies
-        def info_to_coordinates(row, col, orientation, size):
-            coordinates = []
-            if orientation == 'up':
-                for i in range(size):
-                    coordinates.append(chr(ord(row) - i) + col)
-            elif orientation == 'down':
-                for i in range(size):
-                    coordinates.append(chr(ord(row) + i) + col)
-            elif orientation == 'left':
-                for i in range(size):
-                    coordinates.append(row + str((int(col) - i)))
-            elif orientation == 'right':
-                for i in range(size):
-                    coordinates.append(row + str((int(col) + i)))
-            return coordinates
-
-        # Returns whether or not there is a conflict when adding a battleship to a coordinate
-        def conflict_exists(battleship_info, row, col, orientation, size):
-            if ((orientation == 'up' and ord(row) - 64 - size < 0) or 
-                (orientation == 'down' and ord(row) - 64 + size > 11) or 
-                (orientation == 'left' and int(col) + size < 0) or 
-                (orientation == 'right' and int(col) + size > 11)):
-                return True
-
-            for (ship_row, ship_col, ship_orientation, ship_size) in battleship_info:
-                ship_coordinates = info_to_coordinates(ship_row, ship_col, ship_orientation, ship_size)
-                curr_coordinates = info_to_coordinates(row, col, orientation, size)
-
-                if not set(ship_coordinates).isdisjoint(curr_coordinates):
-                    return True
-            return False
 
         for index, (ship_name, ship_size) in enumerate(battleships):
             print("Place your '{}' piece of size {}.".format(ship_name, ship_size))
@@ -90,10 +102,10 @@ class Human(PlayerInterface):
 
             # Edge case where other battleships surround input coordinate
             while (
-                conflict_exists(battleship_info, row, col, 'up', ship_size) and 
-                conflict_exists(battleship_info, row, col, 'down', ship_size) and
-                conflict_exists(battleship_info, row, col, 'right', ship_size) and
-                conflict_exists(battleship_info, row, col, 'left', ship_size)
+                self.conflict_exists(battleship_info, row, col, 'up', ship_size) and 
+                self.conflict_exists(battleship_info, row, col, 'down', ship_size) and
+                self.conflict_exists(battleship_info, row, col, 'right', ship_size) and
+                self.conflict_exists(battleship_info, row, col, 'left', ship_size)
                 ):
                 print("Invalid coordinate detected. Please re-enter another set of coordinates.")
 
@@ -109,12 +121,15 @@ class Human(PlayerInterface):
             orientation = input("Orientation (up, down, left, right): ").lower()
             while (
                 (orientation != 'up' and orientation != 'down' and orientation != 'left' and orientation != 'right') or 
-                conflict_exists(battleship_info, row, col, orientation, ship_size)
+                self.conflict_exists(battleship_info, row, col, orientation, ship_size)
             ):
                 orientation = input("Please enter a valid orientation (up, down, left, right) " +
                 "that doesn't go out of bounds and doesn't overlap with your other battleships: ").lower()
             
             battleship_info.append([row, col, orientation, ship_size])
+
+        self.print_board(battleship_info)
+
         return battleship_info
 
     # Polls in terminal for the human to give their turn. array input is not used.
@@ -130,3 +145,5 @@ class Human(PlayerInterface):
             player_col = input("Please enter a number (1-10) indicating the column of your move (1-10): ")
         
         return player_row + player_col
+
+Human().place_battleships()
