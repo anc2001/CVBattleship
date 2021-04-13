@@ -77,15 +77,15 @@ class PlayerInterface:
     # move is valid and hits, returns 0 if the move is invalid
     def receive_turn(self, move):
 
-        def check_if_sunk(row, col):
+        def check_if_sunk(hit_row, hit_col):
             for i in range(5):
                 ship_coordinates = self.battleship_coords[i]
                 for coord in ship_coordinates:
-                    if coord == (row, col):
-                        flag = 4
+                    if coord[0] == hit_row and coord[1] == hit_col: 
+                        flag = 3
                         for (x,y) in ship_coordinates:
                             flag = flag & int(self.own_board[x][y])
-                        if flag == 4:
+                        if flag == 3:
                             self.battleship_sunk[i] = 1
                             return 1
                         return 0
