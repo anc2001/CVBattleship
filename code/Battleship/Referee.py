@@ -33,7 +33,7 @@ class Referee:
                 current_player.make_turn(move + "H")
             current_player = self.other_player()
             self.isplayer1 = not self.isplayer1
-         print("{} has lost".format(names[not self.isplayer1]))
+        print("{} has lost!".format(names[not self.isplayer1]))
         
 
     """
