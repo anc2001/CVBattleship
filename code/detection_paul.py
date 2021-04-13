@@ -61,17 +61,14 @@ distances = np.zeros(num_circles)
 for i in range(num_circles):
     pt = detected_circles[0,i]
     distances[i] = math.sqrt(((av_x - pt[0]) ** 2) + ((av_y - pt[1]) ** 2))
-
 distances_indices = np.argsort(distances)
 
 closest_pts = np.zeros((4,2))
-for i in range(4):
-    closest_pts[i,0] = detected_circles[0,distances_indices[i]][0]
-    closest_pts[i,1] = detected_circles[0,distances_indices[i]][1]
-
 center_x = 0
 center_y = 0
 for i in range(4):
+    closest_pts[i,0] = detected_circles[0,distances_indices[i]][0]
+    closest_pts[i,1] = detected_circles[0,distances_indices[i]][1]
     center_x += closest_pts[i,0]
     center_y += closest_pts[i,1]
 center_x = center_x / 4
@@ -135,16 +132,16 @@ width = int(img.shape[1] * scale_percent)
 height = int(img.shape[0] * scale_percent)
 shrink = cv2.resize(img,(width, height))
 
-canvas = np.zeros((800,800,3))
+canvas = np.full((800,800,3),.1)
 for i in range(10):
     for j in range(10):
         start = (40 + 80*j,40 + 80*i)
         if board[i,j] == 1:
-            cv2.circle(canvas, start, 40, (255, 255, 255), -1)
+            cv2.circle(canvas, start, 35, (.75, .75, .75), -1)
         elif board[i,j] == 2:
-            cv2.circle(canvas, start, 40, (0, 0, 255), -1)
+            cv2.circle(canvas, start, 35, (.1, .1, .75), -1)
         else:
-            cv2.circle(canvas, start, 40, (255, 0, 0), -1)
+            cv2.circle(canvas, start, 35, (.5, .1, .1), -1)
 
 cv2.imshow("Detected Circles/Board", shrink)
 cv2.imshow("Board Evaluation", canvas)
