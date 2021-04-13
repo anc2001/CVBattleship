@@ -6,8 +6,9 @@ class Human(PlayerInterface):
     def __init__(self):
         super(Human, self).__init__()
         # Battleship terminal stuff
+        self.place_battleships()
 
-    # Takes in move of specificed format, this guaranteed to be a valid move, 
+    # Takes in move of specificed format, this is guaranteed to be a valid move, 
     # so just edit the opposing board
     def make_turn(self, move):
         if len(move == 3):
