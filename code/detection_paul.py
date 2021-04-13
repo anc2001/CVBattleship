@@ -28,7 +28,8 @@ blur = cv2.blur(gray, (3, 3))
 # detect circles
 detected_circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, 
     1, min_distance, param1 = parameter1, param2 = parameter21, minRadius = min_radius, maxRadius = max_radius)
-
+if detected_circles is None:
+    print("No circles were detected in the image")
 num_circles = detected_circles.shape[1]
 sorted_circles = np.sort(detected_circles[0,:,2])
 med_rad = int(sorted_circles[int(num_circles/2)])
@@ -37,6 +38,8 @@ min_rad = med_rad - min_offset
 max_rad = med_rad + max_offset
 detected_circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, 
     1, min_distance, param1 = parameter1, param2 = parameter22, minRadius = min_rad, maxRadius = max_rad)
+if detected_circles is None:
+    print("No circles were detected in the image")
 
 for pt in detected_circles[0,:]:
     a, b, r = int(pt[0]), int(pt[1]), int(pt[2])

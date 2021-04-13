@@ -11,6 +11,11 @@ class Referee:
     def play_game(self):
         pass
 
+
+    """
+    Returns a board state corresponding to the input image.
+    If no circles are detected in the image it will return 0.
+    """
     def getBoardFromImage(self, image):
         # adjustable parameters
         parameter1 = 50
@@ -31,9 +36,11 @@ class Referee:
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         blur = cv2.blur(gray, (3, 3))
 
-        # detect the holes and pegs in the image
+        # detect the holes and pegs in the image, returns 0 if no circles are found
         detected_circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, 
             1, min_distance, param1 = parameter1, param2 = parameter21, minRadius = min_radius, maxRadius = max_radius)
+        if detected_circles is None:
+            return 0
         num_circles = detected_circles.shape[1]
         sorted_circles = np.sort(detected_circles[0,:,2])
         med_rad = int(sorted_circles[int(num_circles/2)])
@@ -41,6 +48,8 @@ class Referee:
         max_rad = med_rad + max_offset
         detected_circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, 
             1, min_distance, param1 = parameter1, param2 = parameter22, minRadius = min_rad, maxRadius = max_rad)
+        if detected_circles is None:
+            return 0
 
         # find corners of the grid using the detected circles
         num_circles = detected_circles.shape[1]
