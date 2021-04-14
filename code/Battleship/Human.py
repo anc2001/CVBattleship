@@ -42,7 +42,6 @@ class Human(PlayerInterface):
         print(board)
         return board
 
-
     # Given coordinates, orientation, and size, return coordinates that battleship occupies
     def info_to_coordinates(self, row, col, orientation, size):
         coordinates = []
@@ -146,5 +145,3 @@ class Human(PlayerInterface):
             player_col = input("Please enter a number (1-10) indicating the column of your move (1-10): ")
         
         return player_row + player_col
-
-Human().place_battleships()
