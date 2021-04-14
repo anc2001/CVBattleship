@@ -81,16 +81,19 @@ class Human(PlayerInterface):
         return battleship_info
 
     # Polls in terminal for the human to give their turn. array input is not used.
-    def suggest_turn(self, array):
+    def suggest_turn(self):
         # Get row for move
-        player_row = input("Enter the row of your move (A-J): ").upper()
-        while len(player_row) != 1 or not player_row.isalpha() or not player_row in "ABCDEFGHIJ":
-            player_row = input("Please enter a letter (A-J) indicating the row of your move (A-J): ").upper()
+        if self.use_camera:
+            print("Place your move")
+            return 
+        else: 
+            player_row = input("Enter the row of your move (A-J): ").upper()
+            while len(player_row) != 1 or not player_row.isalpha() or not player_row in "ABCDEFGHIJ":
+                player_row = input("Please enter a letter (A-J) indicating the row of your move (A-J): ").upper()
         
-        # Get column for move
-        player_col = input("Enter the column of your move (1-10): ")
-        while player_col != '10' and (len(player_col) != 1 or not player_col.isnumeric()):
-            player_col = input("Please enter a number (1-10) indicating the column of your move (1-10): ")
-        
-        return player_row + player_col
+            # Get column for move
+            player_col = input("Enter the column of your move (1-10): ")
+            while player_col != '10' and (len(player_col) != 1 or not player_col.isnumeric()):
+                player_col = input("Please enter a number (1-10) indicating the column of your move (1-10): ")
+            return player_row + player_col
 
