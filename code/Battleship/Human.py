@@ -8,6 +8,7 @@ class Human(PlayerInterface):
         # Battleship terminal stuff
         self.battleships = self.place_battleships()
         self.set_own_board()
+        self.use_camera = 0
 
     # Takes in move of specificed format, this is guaranteed to be a valid move, 
     # so just edit the opposing board

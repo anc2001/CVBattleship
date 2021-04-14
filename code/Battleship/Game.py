@@ -21,6 +21,16 @@ def parse_args():
         '--player2',
         required=False,
         help='''Player 2 name if human player''')
+    parser.add_argument(
+        '--player1_usecamera',
+        required=False,
+        choices=['yes', 'no'],
+        help='''If player1 is using a camera then yes''')
+    parser.add_argument(
+        '--player2_usecamera',
+        required=False,
+        choices=['yes', 'no'],
+        help='''If player2 is using a camera then yes''')
 
 
     return parser.parse_args()
