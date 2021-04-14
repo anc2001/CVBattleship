@@ -6,31 +6,12 @@ class Human(PlayerInterface):
     def __init__(self):
         super(Human, self).__init__()
         # Battleship terminal stuff
+        if self.use_camera:
+            self.battleships = self.place_battleships_camera()
         self.battleships = self.place_battleships()
         self.set_own_board()
         self.use_camera = 0
-
-    # Takes in move of specificed format, this is guaranteed to be a valid move, 
-    # so just edit the opposing board
-    def make_turn(self, move):
-        if len(move) == 3:
-            row = ord(move[0])-65
-            column = int(move[1]) - 1
-            if ord(move[2]) == 72:
-                value = 2
-            elif ord(move[2]) == 77:
-                value = 1
-            self.opp_board[row][column] = value
-        else:
-            row = ord(move[0])-65
-            column = int(move[1:3]) - 1
-            if ord(move[3]) == 72:
-                value = 2
-            elif ord(move[3]) == 77:
-                value = 1
-            self.opp_board[row][column] = value  
-        return 0
-
+    
     # Print battleship board
     def print_board(self, battleship_info):
         board = np.zeros((10, 10))
@@ -41,39 +22,6 @@ class Human(PlayerInterface):
                 board[row][col] = 1
         print(board)
         return board
-
-    # Given coordinates, orientation, and size, return coordinates that battleship occupies
-    def info_to_coordinates(self, row, col, orientation, size):
-        coordinates = []
-        if orientation == 'up':
-            for i in range(size):
-                coordinates.append(chr(ord(row) - i) + col)
-        elif orientation == 'down':
-            for i in range(size):
-                coordinates.append(chr(ord(row) + i) + col)
-        elif orientation == 'left':
-            for i in range(size):
-                coordinates.append(row + str((int(col) - i)))
-        elif orientation == 'right':
-            for i in range(size):
-                coordinates.append(row + str((int(col) + i)))
-        return coordinates
-
-    # Returns whether or not there is a conflict when adding a battleship to a coordinate
-    def conflict_exists(self, battleship_info, row, col, orientation, size):
-        if ((orientation == 'up' and ord(row) - 64 - size < 0) or 
-            (orientation == 'down' and ord(row) - 64 + size > 11) or 
-            (orientation == 'left' and int(col) + size < 0) or 
-            (orientation == 'right' and int(col) + size > 11)):
-            return True
-
-        for (ship_row, ship_col, ship_orientation, ship_size) in battleship_info:
-            ship_coordinates = self.info_to_coordinates(ship_row, ship_col, ship_orientation, ship_size)
-            curr_coordinates = self.info_to_coordinates(row, col, orientation, size)
-
-            if not set(ship_coordinates).isdisjoint(curr_coordinates):
-                return True
-        return False
     
     # Prompts user to place 5 battleships on a 10x10 grid. 
     # Returns an array of battleship info that is 5 x 4 with each inner array being in format: [row, column, ship orientation, ship size]

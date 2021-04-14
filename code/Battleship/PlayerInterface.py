@@ -1,5 +1,5 @@
 import numpy as np
-from colorama import init 
+# from colorama import init 
 from termcolor import colored 
 import copy
 
@@ -23,6 +23,7 @@ class PlayerInterface:
         self.battleships = []
         self.battleship_coords = []
         self.battleship_sunk = np.zeros((5,))
+        self.use_camera = 0
     
     # Returns true if this player has lost, false otherwise
     def has_lost(self):
@@ -33,46 +34,53 @@ class PlayerInterface:
     
     # Prints top board, probably change this to make it nicer
     def show_opp_board(self):
-        board = copy.deepcopy(self.opp_board)
-        board = np.where(board == 0, colored("O", 'grey' ,'on_blue'), 
-        np.where(board == 1, colored("X", 'grey' ,'on_blue'), colored("X", 'grey' ,'on_red')))
-        s = ""
-        for i in range(board.shape[0]) :
-            for j in range(board.shape[1]): 
-                s = s + board[i,j]
-            print(s)
-            s = ""
+        # board = copy.deepcopy(self.opp_board)
+        # board = np.where(board == 0, colored("O", 'grey' ,'on_blue'), 
+        # np.where(board == 1, colored("X", 'grey' ,'on_blue'), colored("X", 'grey' ,'on_red')))
+        # s = ""
+        # for i in range(board.shape[0]) :
+        #     for j in range(board.shape[1]): 
+        #         s = s + board[i,j]
+        #     print(s)
+        #     s = ""
+        print(self.opp_board)
     
     # Prints bottom board, probably change this to make it nicer 
     def show_own_board(self):
-        board = copy.deepcopy(self.own_board)
-        board = np.where(board == 0, colored("O", 'grey' ,'on_blue'), 
-        np.where(board == 1, colored("X", 'grey' ,'on_blue'), 
-        np.where(board == 2, colored("O", 'grey' ,'on_white'), colored("X", 'grey' ,'on_red'))))
-        s = ""
-        for i in range(board.shape[0]) :
-            for j in range(board.shape[1]): 
-                s = s + board[i,j]
-            print(s)
-            s = ""
+        # board = copy.deepcopy(self.own_board)
+        # board = np.where(board == 0, colored("O", 'grey' ,'on_blue'), 
+        # np.where(board == 1, colored("X", 'grey' ,'on_blue'), 
+        # np.where(board == 2, colored("O", 'grey' ,'on_white'), colored("X", 'grey' ,'on_red'))))
+        # s = ""
+        # for i in range(board.shape[0]) :
+        #     for j in range(board.shape[1]): 
+        #         s = s + board[i,j]
+        #     print(s)
+        #     s = ""
+        print(self.own_board)
 
+    # Given coordinates, orientation, and size, return coordinates that battleship occupies
+    def info_to_coordinates(self, row, col, orientation, size):
+        coordinates = []
+        if orientation == 'up':
+            for i in range(size):
+                coordinates.append(chr(ord(row) - i) + col)
+        elif orientation == 'down':
+            for i in range(size):
+                coordinates.append(chr(ord(row) + i) + col)
+        elif orientation == 'left':
+            for i in range(size):
+                coordinates.append(row + str((int(col) - i)))
+        elif orientation == 'right':
+            for i in range(size):
+                coordinates.append(row + str((int(col) + i)))
+        return coordinates
+
+    #To do fill this in
+    def place_battleships_camera(self):
+        return []
+    
     def set_own_board(self):
-        def info_to_coordinates(row, col, orientation, size):
-            coordinates = []
-            if orientation == 'up':
-                for i in range(size):
-                    coordinates.append(chr(ord(row) - i) + col)
-            elif orientation == 'down':
-                for i in range(size):
-                    coordinates.append(chr(ord(row) + i) + col)
-            elif orientation == 'left':
-                for i in range(size):
-                    coordinates.append(row + str((int(col) - i)))
-            elif orientation == 'right':
-                for i in range(size):
-                    coordinates.append(row + str((int(col) + i)))
-            return coordinates
-
         def converter(moves):
             coordinates = []
             for move in moves:
@@ -89,8 +97,24 @@ class PlayerInterface:
 
         for i in range(5):
             ship = self.battleships[i]
-            coords = info_to_coordinates(ship[0], ship[1], ship[2], ship[3])
+            coords = self.info_to_coordinates(ship[0], ship[1], ship[2], ship[3])
             self.battleship_coords.append(converter(coords))
+
+    # Returns whether or not there is a conflict when adding a battleship to a coordinate
+    def conflict_exists(self, battleship_info, row, col, orientation, size):
+        if ((orientation == 'up' and ord(row) - 64 - size < 0) or 
+            (orientation == 'down' and ord(row) - 64 + size > 11) or 
+            (orientation == 'left' and int(col) - size < 0) or 
+            (orientation == 'right' and int(col) + size > 11)):
+            return True
+
+        for (ship_row, ship_col, ship_orientation, ship_size) in battleship_info:
+            ship_coordinates = self.info_to_coordinates(ship_row, ship_col, ship_orientation, ship_size)
+            curr_coordinates = self.info_to_coordinates(row, col, orientation, size)
+
+            if not set(ship_coordinates).isdisjoint(curr_coordinates):
+                return True
+        return False
 
     # Receives move of specified format letter followed by integer, changes
     # board and returns 1 if the move is valid and misses, returns 2 if the 
@@ -111,6 +135,11 @@ class PlayerInterface:
                                 return 1
                             return 0
             return 0
+
+        def poll_for_change(h_or_m):
+            #Just needs to check if the current board equals the one detected
+            print("The other player wants to move at {}, place to continue the game!".format(move))
+            return
         
         row = 0
         column = 0
@@ -129,12 +158,46 @@ class PlayerInterface:
             self.own_board[row][column] = 3
             print("Hit!")
             sunk = check_if_sunk(row, column)
+            #Note, this only returns 3 for when we go to train the neural network lol
             if sunk: 
                 print("You sunk one as well!")
+                if self.use_camera:
+                    poll_for_change("H")
                 return 3
             else:
+                if self.use_camera:
+                    poll_for_change("H")
                 return 2
         else:
             self.own_board[row][column] = 1
             print("Miss!")
+            if self.use_camera:
+                poll_for_change("M")
             return 1
+    
+    # Takes in move of specificed format, this is guaranteed to be a valid move, 
+    # so just edit the opposing board
+    def make_turn(self, move):
+        if len(move) == 3:
+            row = ord(move[0])-65
+            column = int(move[1]) - 1
+            if ord(move[2]) == 72:
+                value = 2
+            elif ord(move[2]) == 77:
+                value = 1
+            self.opp_board[row][column] = value
+        else:
+            row = ord(move[0])-65
+            column = int(move[1:3]) - 1
+            if ord(move[3]) == 72:
+                value = 2
+            elif ord(move[3]) == 77:
+                value = 1
+            self.opp_board[row][column] = value 
+        
+        if self.use_camera:
+            #Poll for confirmational change, wait until the board matches our board
+            print("Your move is valid, and the other player has confirmed it. Place your piece to continue!")
+            return 0
+        else:
+            return 0

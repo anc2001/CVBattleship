@@ -17,20 +17,23 @@ class Referee:
     def play_game(self):
         current_player = self.player1
         names = ["Player 1", "Player 2"]
+        move = ""
         while(not current_player.has_lost()):
-            print("It's {}'s turn".format(names[not self.isplayer1]))
+            print("It's {}'s turn after receiving {}".format(names[not self.isplayer1], move))
             current_player.show_opp_board()
             print(" ")
             current_player.show_own_board()
-            move = current_player.suggest_turn(current_player.opp_board)
+            move = current_player.suggest_turn()
             hit_or_miss = self.other_player().receive_turn(move)
             while(not hit_or_miss): 
                 print("Invalid Move! Try again!")
-                move = current_player.suggest_turn(current_player.opp_board)
+                move = current_player.suggest_turn()
                 hit_or_miss = self.other_player().receive_turn(move)
             if hit_or_miss == 1:
+                print("{} misses with move {}".format(names[not self.isplayer1], move))
                 current_player.make_turn(move + "M")
             else:
+                print("{} hits with move {}".format(names[not self.isplayer1], move))
                 current_player.make_turn(move + "H")
             current_player = self.other_player()
             self.isplayer1 = not self.isplayer1
