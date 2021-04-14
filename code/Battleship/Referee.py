@@ -20,6 +20,7 @@ class Referee:
         while(not current_player.has_lost()):
             print("It's {}'s turn".format(names[not self.isplayer1]))
             current_player.show_opp_board()
+            print(" ")
             current_player.show_own_board()
             move = current_player.suggest_turn(current_player.opp_board)
             hit_or_miss = self.other_player().receive_turn(move)

@@ -147,4 +147,3 @@ class Human(PlayerInterface):
         
         return player_row + player_col
 
-Human().place_battleships()
