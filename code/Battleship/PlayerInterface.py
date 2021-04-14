@@ -36,7 +36,7 @@ class PlayerInterface:
     def show_opp_board(self):
         board = copy.deepcopy(self.opp_board)
         board = np.where(board == 0, colored("O", 'grey' ,'on_blue'), 
-        np.where(board == 1, colored("X", 'grey' ,'on_blue'), colored("X", 'grey' ,'on_red')))
+        np.where(board == 1, colored("X", 'grey' ,'on_white'), colored("X", 'grey' ,'on_red')))
         s = ""
         alph = 65
         print("  12345678910")
@@ -51,8 +51,8 @@ class PlayerInterface:
     def show_own_board(self):
         board = copy.deepcopy(self.own_board)
         board = np.where(board == 0, colored("O", 'grey' ,'on_blue'), 
-        np.where(board == 1, colored("X", 'grey' ,'on_blue'), 
-        np.where(board == 2, colored("O", 'grey' ,'on_white'), colored("X", 'grey' ,'on_red'))))
+        np.where(board == 1, colored("X", 'grey' ,'on_white'), 
+        np.where(board == 2, colored("O", 'white' ,'on_grey'), colored("X", 'grey' ,'on_red'))))
         s = ""
         alph = 65
         print("  12345678910")
