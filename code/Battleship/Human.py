@@ -144,9 +144,5 @@ class Human(PlayerInterface):
         while player_col != '10' and (len(player_col) != 1 or not player_col.isnumeric()):
             player_col = input("Please enter a number (1-10) indicating the column of your move (1-10): ")
         
-<<<<<<< HEAD
         return player_row + player_col
 
-=======
-        return player_row + player_col
->>>>>>> 0dcb06465e5900568889d337a69ba605997b3af5
