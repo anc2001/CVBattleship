@@ -1,5 +1,5 @@
 import numpy as np
-# from colorama import init 
+from colorama import init 
 from termcolor import colored 
 import copy
 
@@ -34,30 +34,28 @@ class PlayerInterface:
     
     # Prints top board, probably change this to make it nicer
     def show_opp_board(self):
-        # board = copy.deepcopy(self.opp_board)
-        # board = np.where(board == 0, colored("O", 'grey' ,'on_blue'), 
-        # np.where(board == 1, colored("X", 'grey' ,'on_blue'), colored("X", 'grey' ,'on_red')))
-        # s = ""
-        # for i in range(board.shape[0]) :
-        #     for j in range(board.shape[1]): 
-        #         s = s + board[i,j]
-        #     print(s)
-        #     s = ""
-        print(self.opp_board)
+        board = copy.deepcopy(self.opp_board)
+        board = np.where(board == 0, colored("O", 'grey' ,'on_blue'), 
+        np.where(board == 1, colored("X", 'grey' ,'on_blue'), colored("X", 'grey' ,'on_red')))
+        s = ""
+        for i in range(board.shape[0]) :
+            for j in range(board.shape[1]): 
+                s = s + board[i,j]
+            print(s)
+            s = ""
     
     # Prints bottom board, probably change this to make it nicer 
     def show_own_board(self):
-        # board = copy.deepcopy(self.own_board)
-        # board = np.where(board == 0, colored("O", 'grey' ,'on_blue'), 
-        # np.where(board == 1, colored("X", 'grey' ,'on_blue'), 
-        # np.where(board == 2, colored("O", 'grey' ,'on_white'), colored("X", 'grey' ,'on_red'))))
-        # s = ""
-        # for i in range(board.shape[0]) :
-        #     for j in range(board.shape[1]): 
-        #         s = s + board[i,j]
-        #     print(s)
-        #     s = ""
-        print(self.own_board)
+        board = copy.deepcopy(self.own_board)
+        board = np.where(board == 0, colored("O", 'grey' ,'on_blue'), 
+        np.where(board == 1, colored("X", 'grey' ,'on_blue'), 
+        np.where(board == 2, colored("O", 'grey' ,'on_white'), colored("X", 'grey' ,'on_red'))))
+        s = ""
+        for i in range(board.shape[0]) :
+            for j in range(board.shape[1]): 
+                s = s + board[i,j]
+            print(s)
+            s = ""
 
     # Given coordinates, orientation, and size, return coordinates that battleship occupies
     def info_to_coordinates(self, row, col, orientation, size):
