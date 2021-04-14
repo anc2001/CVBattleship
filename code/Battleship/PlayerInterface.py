@@ -38,10 +38,13 @@ class PlayerInterface:
         board = np.where(board == 0, colored("O", 'grey' ,'on_blue'), 
         np.where(board == 1, colored("X", 'grey' ,'on_blue'), colored("X", 'grey' ,'on_red')))
         s = ""
+        alph = 65
+        print("  12345678910")
         for i in range(board.shape[0]) :
             for j in range(board.shape[1]): 
                 s = s + board[i,j]
-            print(s)
+            print(chr(alph) + " " + s)
+            alph+=1
             s = ""
     
     # Prints bottom board, probably change this to make it nicer 
@@ -51,10 +54,13 @@ class PlayerInterface:
         np.where(board == 1, colored("X", 'grey' ,'on_blue'), 
         np.where(board == 2, colored("O", 'grey' ,'on_white'), colored("X", 'grey' ,'on_red'))))
         s = ""
+        alph = 65
+        print("  12345678910")
         for i in range(board.shape[0]) :
             for j in range(board.shape[1]): 
                 s = s + board[i,j]
-            print(s)
+            print(chr(alph) + " " + s)
+            alph+=1
             s = ""
 
     # Given coordinates, orientation, and size, return coordinates that battleship occupies
