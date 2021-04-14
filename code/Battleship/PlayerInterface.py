@@ -40,6 +40,7 @@ class PlayerInterface:
         s = ""
         alph = 65
         print("  12345678910")
+        print(" ")
         for i in range(board.shape[0]) :
             for j in range(board.shape[1]): 
                 s = s + board[i,j]
@@ -56,6 +57,7 @@ class PlayerInterface:
         s = ""
         alph = 65
         print("  12345678910")
+        print(" ")
         for i in range(board.shape[0]) :
             for j in range(board.shape[1]): 
                 s = s + board[i,j]
