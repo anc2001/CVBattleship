@@ -30,26 +30,39 @@ x_max = int(np.average(xs[-sample_size:]) + 20)
 y_min = int(np.average(ys[0:sample_size]) + 40)
 y_max = int(np.average(ys[-sample_size:]) + 40)
 
-cv2.line(img, (x_min, y_max), (x_min, y_min), (255, 255, 255), 2)
-cv2.line(img, (x_min, y_max), (x_max, y_max), (255, 255, 255), 2)
-cv2.line(img, (x_min, y_min), (x_max, y_min), (255, 255, 255), 2)
-cv2.line(img, (x_max, y_min), (x_max, y_max), (255, 255, 255), 2)
-
 x_step = (x_max - x_min) / 10
 y_step = (y_max - y_min) / 10
-for i in range(11):
-    cv2.line(img, (int(x_min + x_step*i), y_max), (int(x_min + x_step*i), y_min), (255, 255, 255), 2)
-    cv2.line(img, (x_min, int(y_min + y_step*i)), (x_max, int(y_min + y_step*i)), (255, 255, 255), 2)
 
-# show circles on image
-for pt in detected_circles[0,:]:
-    a, b, r = int(pt[0]), int(pt[1]), int(pt[2])
-    cv2.circle(img, (a,b), r, (0, 255, 0), 2)
-    cv2.circle(img, (a,b), 1, (0, 0, 255), 3)
-# press escape to get out of image window or your terminal might bug out
-plt.imshow(img)
-plt.show()
-# cv2.imshow("Detected Circles", img)
-# key = cv2.waitKey(0)
-# if key == 27:
-#     cv2.destroyAllWindows()
+board = np.zeros((10,10))
+for i in range(10):
+    for j in range(10):
+        x_left = int(x_min + x_step*j)
+        x_right = int(x_left + x_step)
+        y_up = int(y_min + y_step*i)
+        y_down = int(y_up + y_step)
+        circle = False
+        for pt in detected_circles[0,:]:
+            a, b, r = int(pt[0]), int(pt[1]), int(pt[2])
+            if x_left <= a <= x_right and y_up <= b <= y_down:
+                circle = True
+                ba = a
+                bb = b
+                br = r
+        if circle == True:
+            red_window = img[bb-br:bb+br,ba-br:ba+br,2]
+            window = img[bb-br:bb+br,ba-br:ba+br,:]
+        else:
+            offset_x = int(x_step/3)
+            offset_y = int(y_step/3)
+            red_window = img[y_up+offset_y:y_down-offset_y,x_left+offset_x:x_right-offset_x,2]
+            window = img[y_up+offset_y:y_down-offset_y,x_left+offset_x:x_right-offset_x,:]
+        value = int(np.mean(window))
+        red_value = int(np.mean(red_window))
+        if value > 150:
+            board[i,j] = 1
+        elif red_value > 175:
+            board[i,j] = 2
+        else:
+            board[i,j] = 0
+
+print(board)

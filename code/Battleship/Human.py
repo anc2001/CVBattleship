@@ -6,11 +6,10 @@ class Human(PlayerInterface):
     def __init__(self):
         super(Human, self).__init__()
         # Battleship terminal stuff
-        if self.use_camera:
-            self.battleships = self.place_battleships_camera()
+        # if self.use_camera:
+        #     self.battleships = self.place_battleships_camera()
         self.battleships = self.place_battleships()
         self.set_own_board()
-        self.use_camera = 0
     
     # Print battleship board
     def print_board(self, battleship_info):
@@ -82,11 +81,46 @@ class Human(PlayerInterface):
 
     # Polls in terminal for the human to give their turn. array input is not used.
     def suggest_turn(self):
-        # Get row for move
+        #Returns "" if the input board differs from the internal opp_board by 
+        #any number other than 1. Returns the move in question otherwise
+        def get_move_from_board(board):
+            if board == 0:
+                return ""
+            coords = []
+            for i in range(10):
+                for j in range(10):
+                    if board[i][j] != self.opp_board[i][j]:
+                        coords.append((i,j))
+            if len(coords) == 1:
+                (row, col) = coords[0]
+                row = chr(row + 65)
+                col = str(col + 1)
+                move = row + col
+                return move
+            else:
+                return ""
+        
         if self.use_camera:
-            print("Place your move")
-            return 
+            print("Place your move, the game will not continue if there is funky business :3")
+            _, img = self.vc.read()
+            suggested_board = self.getBoardFromImage(img)
+            if suggested_board == 0:
+                print("Cannot find board!")
+            else:
+                print("Found board, waiting for change")
+            move = get_move_from_board(suggested_board)
+            while (move == ""):
+                _, img = self.vc.read()
+                suggested_board = self.getBoardFromImage(img)
+                if suggested_board == 0:
+                    print("Cannot find board!")
+                else:
+                    print("Found board, waiting for change")
+                move = get_move_from_board(suggested_board)
+            print("Player places {}".format(move))
+            return move
         else: 
+            # Get row for move
             player_row = input("Enter the row of your move (A-J): ").upper()
             while len(player_row) != 1 or not player_row.isalpha() or not player_row in "ABCDEFGHIJ":
                 player_row = input("Please enter a letter (A-J) indicating the row of your move (A-J): ").upper()

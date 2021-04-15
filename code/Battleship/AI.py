@@ -8,10 +8,11 @@ class AI(PlayerInterface):
         self.previousmoves = set()
         self.rows = np.array(['A','B','C','D','E','F','G','H','I','J'])
         self.cols = np.array(['1','2','3','4','5','6','7','8','9','10'])
-        if self.use_camera:
-            self.battleships = self.place_battleships_camera()
-        else:
-            self.battleships = self.place_battleships_random()
+        # if self.use_camera:
+        #     self.battleships = self.place_battleships_camera()
+        # else:
+        #     self.battleships = self.place_battleships_random()
+        self.battleships = self.place_battleships_random()
         self.set_own_board()
 
     # Randomly places 5 battleships on a 10x10 grid. 
