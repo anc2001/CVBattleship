@@ -1,17 +1,73 @@
-import cv2 
-import os
 import numpy as np
-from numpy import pi, exp, sqrt
-from skimage import io, img_as_float32, img_as_ubyte
-from skimage.color import rgb2gray
+import cv2 
 import matplotlib.pyplot as plt
+import os
+import copy
 
-# image = cv2.imread('../data/bottom/first_setup/000/front_full.png')
-image = cv2.imread('../data/top/background/003/front.png')
-gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+# for i in range(8):
+#     markerImage = cv2.aruco.drawMarker(dictionary, i, 70, 1)
+#     cv2.imwrite("{}.png".format(i), markerImage)
 
-blur = cv2.GaussianBlur(gray,(15,15),0)
-thresh = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-thresh = cv2.bitwise_not(thresh)
-plt.imshow(thresh)
+# vc = cv2.VideoCapture(0)
+# _,image = vc.read()
+
+dictionary = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_100)
+parameters = cv2.aruco.DetectorParameters_create()
+
+image = cv2.imread("../data/yay.png")
+
+markerCorners, markerIds, _ = cv2.aruco.detectMarkers(image, dictionary, parameters=parameters)
+
+outputimage = copy.deepcopy(image)
+cv2.aruco.drawDetectedMarkers(outputimage, markerCorners, markerIds)
+plt.imshow(outputimage)
 plt.show()
+
+markerCorners = [m[0] for m in markerCorners]
+
+corners = []
+for array in markerCorners:
+    point = np.sum(array, axis=0)
+    corners.append((int(point[0] / 4), int(point[1] / 4)))
+
+dtype = [('x', int), ('y', int)]
+corners = np.array(corners, dtype=dtype)
+corners = np.sort(corners, order='y')
+
+top_coords = corners[0:4]
+bottom_coords = corners[-4:]
+
+#Array inputis unordered
+def perspective_transform(img, array):
+    # top_left, top_right, bottom_left, bottom_right = [495, 179], [1693, 162], [552, 1319], [1664, 1300] # top/no_background/004/front
+    first = np.array(array, dtype=dtype)
+    first = np.sort(array, order='y')
+    total = np.append(np.sort(first[0:2], order='x'), np.sort(first[-2:], order='x'))
+    total = [[coord[0], coord[1]] for coord in total]
+    top_left, top_right, bottom_left, bottom_right = total[0], total[1], total[2], total[3]
+    x_size, y_size = img.shape[1], img.shape[0]
+
+    inner_crop = np.float32([top_left, top_right, bottom_left, bottom_right])
+    # inner_crop = corners
+    outer_crop = np.float32([[0, 0], [x_size, 0], [0, y_size], [x_size, y_size]])
+
+    M = cv2.getPerspectiveTransform(inner_crop, outer_crop)
+
+    dst = cv2.warpPerspective(img, M, (x_size, y_size))
+
+    plt.subplot(121),plt.imshow(img),plt.title('Input')
+    plt.subplot(122),plt.imshow(dst),plt.title('Output')
+    mng = plt.get_current_fig_manager()
+    mng.full_screen_toggle()
+    plt.show()
+
+perspective_transform(image, top_coords)
+perspective_transform(image, bottom_coords)
+
+# for array in corners:
+#     cv2.circle(image, (array[0],array[1]), radius=0, color=(0, 255, 0), thickness=-1)
+
+# corners = np.sort(corners)
+# print(corners)
+# plt.imshow(image)
+# plt.show()
