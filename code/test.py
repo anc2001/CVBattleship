@@ -8,13 +8,15 @@ import copy
 #     markerImage = cv2.aruco.drawMarker(dictionary, i, 70, 1)
 #     cv2.imwrite("{}.png".format(i), markerImage)
 
-# vc = cv2.VideoCapture(0)
-# _,image = vc.read()
+vc = cv2.VideoCapture(0)
+if not vc.isOpened():
+    print( "No camera found or error opening camera; Using no camera option for player {}")
 
+_,image = vc.read()
 dictionary = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_100)
 parameters = cv2.aruco.DetectorParameters_create()
 
-image = cv2.imread("../data/yay.png")
+# image = cv2.imread("../data/yay.png")
 
 markerCorners, markerIds, _ = cv2.aruco.detectMarkers(image, dictionary, parameters=parameters)
 

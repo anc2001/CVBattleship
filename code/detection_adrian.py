@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # pre process image
-img = cv2.imread('../data/top/background/000/front.png')
+img = cv2.imread('../data/ah.png')
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 blur = cv2.blur(gray, (3, 3))
 
@@ -12,7 +12,7 @@ cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)
 
 # detect circles (parameters tuned by me, not sure how we could come up with them using code)
 detected_circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, 
-    1, 85, param1 = 50, param2 = 40, minRadius = 10, maxRadius = 40)
+    1, 85, param1 = 50, param2 = 40, minRadius = 1, maxRadius = 40)
 
 # Methodology - want to estimate corners from detected points, know they're evenly spaced so
 num_pts = detected_circles.shape[1]

@@ -5,6 +5,7 @@ from termcolor import colored
 import copy
 import math
 import matplotlib.pyplot as plt
+import skimage 
 
 #Functionally abstract class, should never be instantiated
 class PlayerInterface: 
@@ -27,7 +28,10 @@ class PlayerInterface:
         self.battleship_coords = []
         self.battleship_sunk = np.zeros((5,))
         self.use_camera = 0
+        #Aruco stuff
         self.vc = 0
+        self.dictionary = 0
+        self.parameters = 0
     
     # Returns true if this player has lost, false otherwise
     def has_lost(self):
@@ -146,7 +150,7 @@ class PlayerInterface:
                             return 0
             return 0
 
-        def poll_for_change(h_or_m):
+        def poll_for_change():
             #Just needs to check if the current board equals the one detected
             print("The other player wants to move at {}, place to continue the game!".format(move))
             return
@@ -168,21 +172,21 @@ class PlayerInterface:
             self.own_board[row][column] = 3
             print("Hit!")
             sunk = check_if_sunk(row, column)
-            #Note, this only returns 3 for when we go to train the neural network lol
+
             if sunk: 
                 print("You sunk one as well!")
                 if self.use_camera:
-                    poll_for_change("H")
-                return 3
+                    poll_for_change()
+                return 2
             else:
                 if self.use_camera:
-                    poll_for_change("H")
+                    poll_for_change()
                 return 2
         else:
             self.own_board[row][column] = 1
             print("Miss!")
             if self.use_camera:
-                poll_for_change("M")
+                poll_for_change()
             return 1
     
     # Takes in move of specificed format, this is guaranteed to be a valid move, 
@@ -205,16 +209,40 @@ class PlayerInterface:
                 value = 1
             self.opp_board[row][column] = value 
         
+        def check_equality(current_board):
+            if len(current_board) != 0:
+                for i in range(10):
+                    for j in range(10):
+                        if self.opp_board[i][j] != current_board[i][j]:
+                            return 1
+                return 0
+            else:
+                return 1
+
         if self.use_camera:
             #Poll for confirmational change, wait until the board matches our board
-            print("Place your piece to continue!")
+            print("Place your piece to continue!. The piece to place is {}".format(move))
             _, img = self.vc.read()
-            current_board = self.getBoardFromImage(img)
-            if current_board == 0:
-                print("Cannot find board!")
-            while (not np.equal(self.opp_board, current_board)):
+            corners = self.get_aruco(img)
+            current_board = np.random.rand(10,10)
+            if len(corners) == 0:
+                print("Cannot find board")
+            else:
+                top_img = self.perspective_transform(img, corners[0:4])
+                current_board = self.getBoardFromImage(top_img)
+                if len(current_board) == 0:
+                    print("Cannot find circles")
+            while (check_equality(current_board)):
                 _, img = self.vc.read()
-                current_board = self.getBoardFromImage(img)
+                corners = self.get_aruco(img)
+                if len(corners) == 0:
+                    print("Cannot find board")
+                else:
+                    print("Found board")
+                    top_img = self.perspective_transform(img, corners[0:4])
+                    current_board = self.getBoardFromImage(top_img)
+                    if len(current_board) == 0:
+                        print("Cannot find circles")
             return 0
         else:
             return 0
@@ -225,7 +253,46 @@ class PlayerInterface:
         if not self.vc.isOpened():
             print( "No camera found or error opening camera; Using no camera option for player {}".format(whichplayer + 1))
             self.use_camera = 0
+        else:
+            self.dictionary = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_100)
+            self.parameters = cv2.aruco.DetectorParameters_create()
+    
+    def get_aruco(self, image):
+        markerCorners, _, _ = cv2.aruco.detectMarkers(image, self.dictionary, parameters=self.parameters)
+        if len(markerCorners) < 4:
+            return []
+        
+        markerCorners = [m[0] for m in markerCorners]
+        corners = []
+        for array in markerCorners:
+            point = np.sum(array, axis=0)
+            corners.append((int(point[0] / 4), int(point[1] / 4)))
 
+        dtype = [('x', int), ('y', int)]
+        corners = np.array(corners, dtype=dtype)
+        corners = np.sort(corners, order='y')
+
+        return corners
+    
+    #Array inputs unordered
+    def perspective_transform(self, img, array):
+        dtype = [('x', int), ('y', int)]
+        first = np.array(array, dtype=dtype)
+        first = np.sort(array, order='y')
+        total = np.append(np.sort(first[0:2], order='x'), np.sort(first[-2:], order='x'))
+        total = [[coord[0], coord[1]] for coord in total]
+        top_left, top_right, bottom_left, bottom_right = total[0], total[1], total[2], total[3]
+        x_size, y_size = img.shape[1], img.shape[0]
+
+        inner_crop = np.float32([top_left, top_right, bottom_left, bottom_right])
+        # inner_crop = corners
+        outer_crop = np.float32([[0, 0], [x_size, 0], [0, y_size], [x_size, y_size]])
+
+        M = cv2.getPerspectiveTransform(inner_crop, outer_crop)
+
+        dst = cv2.warpPerspective(img, M, (x_size, y_size))
+
+        return dst
 
     # Returns a board state corresponding to the input image.
     # If no circles are detected in the image it will return 0.
@@ -255,7 +322,7 @@ class PlayerInterface:
         detected_circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, 
             1, min_distance, param1 = parameter1, param2 = parameter21, minRadius = min_radius, maxRadius = max_radius)
         if detected_circles is None:
-            return 0
+            return []
         num_circles = detected_circles.shape[1]
         sorted_circles = np.sort(detected_circles[0,:,2])
         med_rad = int(sorted_circles[int(num_circles/2)])
@@ -264,7 +331,7 @@ class PlayerInterface:
         detected_circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, 
             1, min_distance, param1 = parameter1, param2 = parameter22, minRadius = min_rad, maxRadius = max_rad)
         if detected_circles is None:
-            return 0
+            return []
 
         # find corners of the grid using the detected circles
         num_circles = detected_circles.shape[1]
