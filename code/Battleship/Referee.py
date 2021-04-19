@@ -27,7 +27,7 @@ class Referee:
         parameter1 = 50
         parameter21 = 30
         parameter22 = 40
-        min_distance = 60
+        min_distance = 80
         min_radius = 20
         max_radius = 40
         min_offset = 10
