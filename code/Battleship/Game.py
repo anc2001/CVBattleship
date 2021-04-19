@@ -14,13 +14,17 @@ def parse_args():
         choices=['hvh', 'hva', 'ava'],
         help='''hvh - human vs human, hva - human vs ai, ava - ai vs ai''')
     parser.add_argument(
-        '--player1',
+        '--player1_usecamera',
         required=False,
-        help='''Player 1 name if human player''')
+        choices=['yes', 'no'],
+        default= 'no',
+        help='''If player1 is using a camera then yes''')
     parser.add_argument(
-        '--player2',
+        '--player2_usecamera',
         required=False,
-        help='''Player 2 name if human player''')
+        choices=['yes', 'no'],
+        default= 'no',
+        help='''If player2 is using a camera then yes''')
 
 
     return parser.parse_args()
@@ -29,11 +33,32 @@ def parse_args():
 def main():
     args = parse_args()
     if(args.playermode == "hvh"):
-        Referee(Human(), Human())
+        player1 = Human()
+        if args.player1_usecamera == "yes":
+            player1.initialize_camera(0)
+        player2 = Human()
+        if args.player2_usecamera == "yes":
+            player2.initialize_camera(1)
+        referee = Referee(player1, player2)
+        referee.play_game()
     elif (args.playermode == "hva"):
-        Referee(Human(), AI())
+        player1 = Human()
+        if args.player1_usecamera == "yes":
+            player1.initialize_camera(0)
+        player2 = AI()
+        if args.player2_usecamera == "yes":
+            player2.initialize_camera(1)
+        referee = Referee(player1, player2)
+        referee.play_game()
     elif (args.playermode == "ava"):
-        Referee(AI(), AI())
+        player1 = AI()
+        if args.player1_usecamera == "yes":
+            player1.initialize_camera(0)
+        player2 = AI()
+        if args.player2_usecamera == "yes":
+            player2.initialize_camera(1)
+        referee = Referee(player1, player2)
+        referee.play_game()
 
 
 

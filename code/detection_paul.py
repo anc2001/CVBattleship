@@ -14,7 +14,10 @@ max_offset = 20
 target_image_size = 2000.0
 
 # pre process image
-img = cv2.imread('../data/top/custom_background/003.png')
+# img = cv2.imread('../data/top/custom_background/003.png')
+# img = cv2.imread('../data/bottom/first_setup/004/front_full.png')
+img = cv2.imread('../data/ah.png')
+img = np.array(img)
 scale_percent = target_image_size/img.shape[1]
 width = int(img.shape[1] * scale_percent)
 height = int(img.shape[0] * scale_percent)
