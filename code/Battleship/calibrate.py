@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+from skimage import filters, feature
+from skimage.color import rgb2gray
 
 #Hyperparameters to calibrate 
 #Should be a positive value
@@ -15,6 +17,7 @@ width_left = 60
 #If needed, can include
 width_right = 0
 
+detector = cv2.SimpleBlobDetector()
 
 dictionary = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_100)
 parameters = cv2.aruco.DetectorParameters_create()
@@ -79,17 +82,51 @@ def getBoardFromImage(image):
             x_right = int(x_left + x_step)
             y_up = int(y_step*i)
             y_down = int(y_up + y_step)
-            red_window = img[y_up:y_down,x_left:x_right,2]
             window = img[y_up:y_down,x_left:x_right,:]
-            plt.imshow(window)
-            plt.show()
-            value = int(np.mean(window))
-            red_value = int(np.mean(red_window))
-            if value > 150:
+
+            gray = rgb2gray(window)
+            threshold = np.sqrt(x_step * y_step / (3 * 3 * np.pi))
+            keypoints_white = feature.blob_dog(gray, min_sigma=threshold-1, max_sigma=30)
+            # print(keypoints_white)
+            keypoints_red = feature.blob_dog(window[:,:,2], min_sigma=threshold-1, max_sigma=30)
+            # print(keypoints_red)
+            
+            white_flag = 0
+            red_flag = 0
+            for keypoint in keypoints_white:  
+                if keypoint[2] > threshold:
+                    white_flag = 1
+            for keypoint in keypoints_red:
+                if keypoint[2] > threshold:
+                    red_flag = 1
+            
+            # max_distance = np.amax([x_step, y_step])
+            # current_distance = np.sqrt((center_y - blob_coords[0])**2 + (center_x - blob_coords[1])**2)
+            # if current_distance >= max_distance:
+            #     white_flag = 0
+            #     red_flag = 0
+
+            # offset_x = int(x_step/3)
+            # offset_y = int(y_step/3)
+            # red_window = img[y_up+offset_y:y_down-offset_y,x_left+offset_x:x_right-offset_x,2]
+            # sub_window = img[y_up+offset_y:y_down-offset_y,x_left+offset_x:x_right-offset_x,:]
+            # value = int(np.mean(sub_window))
+            # red_value = int(np.mean(red_window))
+            # print("Sub value: {}".format(value))
+            # print("Sub red value: {}".format(red_value))
+            # print(np.mean(window))
+            
+            # plt.imshow(window)
+            # plt.show()
+
+            if white_flag and red_flag:
+                # print("Detected Miss")
                 board[i,j] = 1
-            elif red_value > 175:
+            elif red_flag:
+                # print("Detected Hit")
                 board[i,j] = 2
             else:
+                # print("Detected nothing present")
                 board[i,j] = 0
         
     return board
@@ -103,3 +140,4 @@ if len(corners) == 0:
 else:
     top_img = perspective_transform(img, corners[0:4])
     current_board = getBoardFromImage(top_img)
+    print(current_board)
