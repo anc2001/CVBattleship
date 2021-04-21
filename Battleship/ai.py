@@ -1,5 +1,5 @@
 import numpy as np
-from PlayerInterface import PlayerInterface
+from playerInterface import PlayerInterface
 
 class AI(PlayerInterface):
     # Constructor for human, poll in terminal for input starting positions

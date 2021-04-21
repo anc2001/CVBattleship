@@ -1,6 +1,6 @@
-from Referee import Referee
-from Human import Human
-from AI import AI
+from referee import Referee
+from human import Human
+from ai import AI
 import argparse
 import random
 
