@@ -113,8 +113,8 @@ def getBoardFromImage(image):
             # print("Sub red value: {}".format(red_value))
             # print(np.mean(window))
             
-            # plt.imshow(window)
-            # plt.show()
+            cv2.imshow("thing" ,window)
+            key = cv2.waitKey(0)
 
             if white_flag and red_flag:
                 # print("Detected Miss")
