@@ -70,9 +70,6 @@ def getBoardFromImage(image):
     height = round(height/10)*10
     img = cv2.resize(img,(width, height))
 
-    plt.imshow(img)
-    plt.show()
-
     x_step = int(width / 10)
     y_step = int(height / 10)
     board = np.zeros((10,10))
