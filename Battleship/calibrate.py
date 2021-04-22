@@ -135,13 +135,13 @@ def getBoardFromImage(image):
         
     return board
 
-vc = cv2.VideoCapture(0)
-_,img = vc.read()
-corners = get_aruco(img)
+# vc = cv2.VideoCapture(0)
+# _,img = vc.read()
+# corners = get_aruco(img)
 
-if len(corners) == 0:
-    print("Cannot find board")
-else:
-    top_img = perspective_transform(img, corners[0:4])
-    current_board = getBoardFromImage(top_img)
-    print(current_board)
+# if len(corners) == 0:
+#     print("Cannot find board")
+# else:
+#     top_img = perspective_transform(img, corners[0:4])
+#     current_board = getBoardFromImage(top_img)
+#     print(current_board)

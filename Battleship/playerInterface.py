@@ -304,6 +304,7 @@ class PlayerInterface:
                 x_right = int(x_left + x_step)
                 y_up = int(y_step*i)
                 y_down = int(y_up + y_step)
+                red_window = img[y_up:y_down,x_left:x_right,2]
                 window = img[y_up:y_down,x_left:x_right,:]
 
                 threshold = np.sqrt(x_step * y_step / (2 * 3 * np.pi))
@@ -320,14 +321,34 @@ class PlayerInterface:
                     if keypoint[2] > threshold:
                         red_flag = 1
 
-                if white_flag and red_flag:
-                    # print("Detected Miss")
+                
+                offset_x = int(x_step/3)    
+                offset_y = int(y_step/3)
+                sub_red_window = np.array(img[y_up+offset_y:y_down-offset_y,x_left+offset_x:x_right-offset_x,2])
+                sub_window = np.array(img[y_up+offset_y:y_down-offset_y,x_left+offset_x:x_right-offset_x,:])
+
+                white_inside_average = np.sum(sub_window) / np.prod(sub_window.shape)
+                red_inside_average = np.sum(sub_red_window) / np.prod(sub_red_window.shape)
+                white_outside_average = (np.sum(window) - np.sum(sub_window)) / (np.prod(window.shape) - np.prod(sub_window.shape))
+                red_outside_average = (np.sum(red_window) - np.sum(sub_red_window)) / (np.prod(red_window.shape) - np.prod(sub_red_window.shape))
+
+                white_difference = white_inside_average - white_outside_average
+                red_difference = red_inside_average - red_outside_average
+                white_color_flag = 0
+                red_color_flag = 0
+                if white_difference > 40:
+                    white_color_flag = 1
+                if red_difference > 40:
+                    red_color_flag = 1
+
+                if (white_flag and red_flag) or (white_color_flag):
+                # print("Detected Miss")
                     board[i,j] = 1
-                elif red_flag:
-                    # print("Detected Hit")
+                elif red_flag or (red_color_flag):
+                # print("Detected Hit")
                     board[i,j] = 2
                 else:
-                    # print("Detected nothing present")
+                # print("Detected nothing present")
                     board[i,j] = 0
         
         return board
