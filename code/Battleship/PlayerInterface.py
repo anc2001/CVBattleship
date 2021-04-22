@@ -1,6 +1,5 @@
 import cv2
-import numpy as np
-from colorama import init 
+import numpy as np 
 from termcolor import colored 
 import copy
 import math
