@@ -70,6 +70,9 @@ def getBoardFromImage(image):
     height = round(height/10)*10
     img = cv2.resize(img,(width, height))
 
+    cv2.imshow('thing', img)
+    key = cv2.waitKey(0)
+
     x_step = int(width / 10)
     y_step = int(height / 10)
     board = np.zeros((10,10))
@@ -80,6 +83,7 @@ def getBoardFromImage(image):
             y_up = int(y_step*i)
             y_down = int(y_up + y_step)
             window = img[y_up:y_down,x_left:x_right,:]
+            red_window = img[y_up:y_down,x_left:x_right,2]
 
             gray = rgb2gray(window)
             threshold = np.sqrt(x_step * y_step / (3 * 3 * np.pi))
@@ -87,7 +91,7 @@ def getBoardFromImage(image):
             # print(keypoints_white)
             keypoints_red = feature.blob_dog(window[:,:,2], min_sigma=threshold-1, max_sigma=30)
             # print(keypoints_red)
-            
+
             white_flag = 0
             red_flag = 0
             for keypoint in keypoints_white:  
@@ -96,30 +100,33 @@ def getBoardFromImage(image):
             for keypoint in keypoints_red:
                 if keypoint[2] > threshold:
                     red_flag = 1
-            
-            # max_distance = np.amax([x_step, y_step])
-            # current_distance = np.sqrt((center_y - blob_coords[0])**2 + (center_x - blob_coords[1])**2)
-            # if current_distance >= max_distance:
-            #     white_flag = 0
-            #     red_flag = 0
 
-            # offset_x = int(x_step/3)
-            # offset_y = int(y_step/3)
-            # red_window = img[y_up+offset_y:y_down-offset_y,x_left+offset_x:x_right-offset_x,2]
-            # sub_window = img[y_up+offset_y:y_down-offset_y,x_left+offset_x:x_right-offset_x,:]
-            # value = int(np.mean(sub_window))
-            # red_value = int(np.mean(red_window))
-            # print("Sub value: {}".format(value))
-            # print("Sub red value: {}".format(red_value))
-            # print(np.mean(window))
-            
-            cv2.imshow("thing" ,window)
-            key = cv2.waitKey(0)
+            offset_x = int(x_step/3)
+            offset_y = int(y_step/3)
+            sub_red_window = np.array(img[y_up+offset_y:y_down-offset_y,x_left+offset_x:x_right-offset_x,2])
+            sub_window = np.array(img[y_up+offset_y:y_down-offset_y,x_left+offset_x:x_right-offset_x,:])
 
-            if white_flag and red_flag:
+            white_inside_average = np.sum(sub_window) / np.prod(sub_window.shape)
+            red_inside_average = np.sum(sub_red_window) / np.prod(sub_red_window.shape)
+            white_outside_average = (np.sum(window) - np.sum(sub_window)) / (np.prod(window.shape) - np.prod(sub_window.shape))
+            red_outside_average = (np.sum(red_window) - np.sum(sub_red_window)) / (np.prod(red_window.shape) - np.prod(sub_red_window.shape))
+
+            white_difference = white_inside_average - white_outside_average
+            red_difference = red_inside_average - red_outside_average
+            white_color_flag = 0
+            red_color_flag = 0
+            if white_difference > 40:
+                white_color_flag = 1
+            if red_difference > 40:
+                red_color_flag = 1
+
+            # cv2.imshow("thing" ,window)
+            # key = cv2.waitKey(0)
+
+            if (white_flag and red_flag) or (white_color_flag):
                 # print("Detected Miss")
                 board[i,j] = 1
-            elif red_flag:
+            elif red_flag or (red_color_flag):
                 # print("Detected Hit")
                 board[i,j] = 2
             else:
