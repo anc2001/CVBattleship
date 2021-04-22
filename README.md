@@ -6,11 +6,6 @@ Print out aruco.pdf and paste the markers on the board similar to the fashion sh
 
 ![](https://i.imgur.com/cSoSDOz.jpg)
 
-The following libraries are used as well, make sure that they are installed 
-* Colorama
-* OpenCV
-* Skimage
-
 Make sure a video camera is also connected to the current system and place it infront of the Battleship board in question
 
 ## Calibration 
